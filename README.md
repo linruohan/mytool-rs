@@ -1,4 +1,6 @@
-# mytool-rs
+# mytool
+
+mytool gui of rust
 
 ```bash
 cd build-aux;sh build.sh

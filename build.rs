@@ -8,7 +8,7 @@ fn main() -> anyhow::Result<()> {
 fn compile_icon_winres() -> anyhow::Result<()> {
     use anyhow::Context;
     let mut res = winresource::WindowsResource::new();
-    res.set("OriginalFileName", "mytool-rs.exe");
+    res.set("OriginalFileName", "mytool.exe");
     res.set_icon("./data/icons/mytool.ico");
     res.compile()
         .context("Failed to compile winresource resource")

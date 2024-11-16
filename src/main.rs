@@ -7,7 +7,7 @@ use adw::prelude::*;
 use gtk::{gio, glib};
 use window::Window;
 
-const APP_ID: &str = "com.github.linruohan.mytool-rs";
+const APP_ID: &str = "com.github.linruohan.mytool";
 
 fn main() -> glib::ExitCode {
     gio::resources_register_include!("mytool.gresource")
