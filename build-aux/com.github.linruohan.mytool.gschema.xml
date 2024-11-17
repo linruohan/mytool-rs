@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schemalist>
-  <schema id="com.github.linruohan.mytool" path="/com/github/linruohan/mytool/">
+  <schema id="com.github.linruohan.mytool" path="/com/github/linruohan/mytool/ui/">
     <key name="filter" type="s">
       <choices>
         <choice value='All'/>

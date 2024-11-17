@@ -1,13 +1,13 @@
 mod collection_object;
+pub(crate) mod config;
 mod task_object;
 mod utils;
 mod window;
 
 use adw::prelude::*;
+pub(crate) use config::APP_ID;
 use gtk::{gio, glib};
 use window::Window;
-
-const APP_ID: &str = "com.github.linruohan.mytool";
 
 fn main() -> glib::ExitCode {
     gio::resources_register_include!("mytool.gresource")
