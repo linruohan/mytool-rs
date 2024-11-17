@@ -14,7 +14,7 @@ use crate::utils::data_path;
 
 // ANCHOR: struct
 // Object holding the state
-#[derive(CompositeTemplate, Default)]
+#[derive(Debug, CompositeTemplate, Default)]
 #[template(resource = "/com/github/linruohan/mytool/ui/window.ui")]
 pub struct Window {
     pub settings: OnceCell<Settings>,

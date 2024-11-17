@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- misc dialogs -->
+<interface>
+  <object class="AdwAlertDialog" id="dialog_close_tab">
+    <property name="heading" translatable="yes">Close Tab</property>
+    <property name="body" translatable="yes">This tab contains unsaved changes.
+Changes which are not saved will be permanently lost.</property>
+    <property name="default-response">save</property>
+    <property name="close-response">cancel</property>
+    <property name="extra-child">
+      <object class="AdwPreferencesGroup" id="close_tab_file_group">
+        <property name="margin-top">12</property>
+      </object>
+    </property>
+    <responses>
+      <response id="cancel" translatable="yes">Cancel</response>
+      <response id="discard" appearance="destructive" translatable="yes">Discard</response>
+      <response id="save" appearance="suggested" translatable="yes">Save</response>
+    </responses>
+  </object>
+
+  <object class="AdwAlertDialog" id="dialog_close_window">
+    <property name="heading" translatable="yes">Close Window</property>
+    <property name="body" translatable="yes">Some opened files contain unsaved changes.
+Changes which are not saved will be permanently lost.</property>
+    <property name="default-response">save</property>
+    <property name="close-response">cancel</property>
+    <property name="extra-child">
+      <object class="AdwPreferencesGroup" id="close_window_files_group">
+        <property name="title" translatable="yes">Unsaved Documents</property>
+      </object>
+    </property>
+    <responses>
+      <response id="cancel" translatable="yes">Cancel</response>
+      <response id="discard" appearance="destructive" translatable="yes">Discard All</response>
+      <response id="save" appearance="suggested" translatable="yes">Save</response>
+    </responses>
+  </object>
+  <object class="AdwAlertDialog" id="dialog_trash_file">
+    <property name="heading" translatable="yes">Trash File</property>
+    <property name="body" translatable="yes">Are you sure you want to move this file to the trash?</property>
+    <property name="default-response">cancel</property>
+    <property name="close-response">cancel</property>
+    <responses>
+      <response id="cancel" translatable="yes">Cancel</response>
+      <response id="trash" appearance="destructive" translatable="yes">Trash</response>
+    </responses>
+  </object>
+</interface>

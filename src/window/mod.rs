@@ -13,9 +13,9 @@ use gtk::{
 };
 
 use crate::collection_object::{CollectionData, CollectionObject};
+use crate::config::APP_ID;
 use crate::task_object::TaskObject;
 use crate::utils::data_path;
-use crate::APP_ID;
 
 glib::wrapper! {
     pub struct Window(ObjectSubclass<imp::Window>)
