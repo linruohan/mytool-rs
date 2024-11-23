@@ -27,6 +27,14 @@ path-absolutize = "3.1"
 palette = "0.7.6"
 async-fs = "2.1"
 chrono = "0.4.38"
+nalgebra = { version = "0.33.0", features = ["serde-serialize"] }
+approx = "0.5.1"
+piet = "0.7.0"
+piet-cairo = "0.7.0"
+rough_piet = "0.8.0"
+roughr = "0.8.0"
+url = "2.5"
+notify-debouncer-full = "0.4.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { version = "0.10.2", features = ["gtk4"] }
