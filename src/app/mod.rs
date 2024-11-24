@@ -2,7 +2,10 @@
 mod appactions;
 
 // Imports
-use crate::{config, RnAppWindow};
+use crate::{
+    config, RnAppMenu, RnAppWindow, RnCanvasWrapper, RnMainHeader, RnOverlays,
+    RnSidebar,
+};
 use adw::subclass::prelude::AdwApplicationImpl;
 use gtk::{gio, glib, glib::clone, prelude::*, subclass::prelude::*};
 
@@ -87,9 +90,11 @@ mod imp {
         /// Custom buildable Widgets need to register
         fn setup_buildables(&self) {
             RnAppWindow::static_type();
-            // RnAppMenu::static_type();
-            // RnMainHeader::static_type();
-            // RnSidebar::static_type();
+            RnAppMenu::static_type();
+            RnMainHeader::static_type();
+            RnSidebar::static_type();
+            RnOverlays::static_type();
+            RnCanvasWrapper::static_type();
         }
 
         /// Initializes and shows a new app window

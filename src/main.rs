@@ -9,11 +9,9 @@
 pub(crate) mod app;
 pub(crate) mod appmenu;
 pub(crate) mod appwindow;
-// pub(crate) mod canvas;
 pub(crate) mod canvaswrapper;
 mod collection_object;
 pub(crate) mod config;
-// pub(crate) mod contextmenu;
 pub(crate) mod dialogs;
 pub(crate) mod env;
 pub(crate) mod filetype;
@@ -23,19 +21,15 @@ pub(crate) mod overlays;
 pub(crate) mod sidebar;
 mod task_object;
 mod utils;
-mod window;
 
 pub(crate) use app::RnApp;
 pub(crate) use appmenu::RnAppMenu;
 pub(crate) use appwindow::RnAppWindow;
-// pub(crate) use canvas::RnCanvas;
 pub(crate) use canvaswrapper::RnCanvasWrapper;
-// pub(crate) use contextmenu::RnContextMenu;
 pub(crate) use filetype::FileType;
 pub(crate) use mainheader::RnMainHeader;
 pub(crate) use overlays::RnOverlays;
 pub(crate) use sidebar::RnSidebar;
-use window::Window;
 
 // Renames
 extern crate nalgebra as na;
@@ -57,31 +51,8 @@ fn main() -> glib::ExitCode {
     if let Err(e) = setup_gresources() {
         eprintln!("failed to setup gresources, Err: {e:?}");
     }
-    // // Create a new application
-    // let app = adw::Application::builder()
-    //     .application_id(config::APP_ID)
-    //     .build();
-
-    // // Connect to signals
-    // app.connect_startup(setup_shortcuts);
-    // app.connect_activate(build_ui);
-
-    // // Run the application
-    // app.run()
     let app = RnApp::new();
     app.run()
-}
-#[allow(unused)]
-fn setup_shortcuts(app: &adw::Application) {
-    app.set_accels_for_action("win.filter('All')", &["<Ctrl>a"]);
-    app.set_accels_for_action("win.filter('Open')", &["<Ctrl>o"]);
-    app.set_accels_for_action("win.filter('Done')", &["<Ctrl>d"]);
-}
-#[allow(unused)]
-fn build_ui(app: &adw::Application) {
-    // Create a new custom window and present it
-    let window = Window::new(app);
-    window.present();
 }
 
 fn setup_tracing() -> anyhow::Result<()> {

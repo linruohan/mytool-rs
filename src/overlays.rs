@@ -3,7 +3,7 @@ use crate::{dialogs, RnAppWindow, RnCanvasWrapper};
 use core::time::Duration;
 use gtk::{
     gio, glib, glib::clone, prelude::*, subclass::prelude::*, CompositeTemplate,
-    Overlay, ProgressBar, ScrolledWindow, Widget,
+    Overlay, ProgressBar, Widget,
 };
 use std::cell::{Cell, RefCell};
 use tracing::error;
@@ -61,8 +61,8 @@ mod imp {
     impl WidgetImpl for RnOverlays {}
     impl RnOverlays {
         fn setup_toolbar_overlay(&self) {
-            // self.toolbar_overlay
-            // .set_measure_overlay(&*self.sidebar_box, true);
+            self.toolbar_overlay
+                .set_measure_overlay(&*self.toast_overlay, true);
         }
     }
 }

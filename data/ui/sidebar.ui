@@ -49,9 +49,41 @@
                 <property name="name">workspacebrowser_page</property>
                 <property name="title" translatable="yes">Workspace</property>
                 <property name="icon-name">workspacebrowser-symbolic</property>
-                <!-- <property name="child">
-                  <object class="RnWorkspaceBrowser" id="workspacebrowser"></object>
-                </property> -->
+                <property name="child">
+                  <object class="AdwToolbarView">
+                    <child type="top">
+                      <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">600</property>
+                        <child>
+                          <object class="GtkToggleButton">
+                            <property name="icon-name">list-add-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">New Collection</property>
+                            <property name="action-name">win.new-collection</property>
+                          </object>
+                        </child>
+                        <child >
+                          <object class="GtkToggleButton">
+                            <property name="icon-name">list-add-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Search Collections</property>
+                            <property name="action-name">win.search-collection</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <property name="content">
+                      <object class="GtkScrolledWindow">
+                        <property name="child">
+                          <object class="GtkListBox" id="collections_list">
+                            <style>
+                              <class name="navigation-sidebar" />
+                            </style>
+                          </object>
+                        </property>
+                      </object>
+                    </property>
+                  </object>
+                </property>
               </object>
             </child>
             <!-- settings page -->

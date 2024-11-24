@@ -5,10 +5,15 @@ mod imp;
 
 // Imports
 use crate::{
-    config, FileType, RnApp, RnCanvasWrapper, RnMainHeader, RnOverlays, RnSidebar,
+    collection_object::CollectionObject, config, dialogs, task_object::TaskObject,
+    FileType, RnApp, RnCanvasWrapper, RnMainHeader, RnOverlays, RnSidebar,
 };
 use adw::{prelude::*, subclass::prelude::*};
-use gtk::{gio, glib, Application, IconTheme};
+use gtk::{
+    gdk, gio, glib, glib::clone, Application, CustomFilter, FilterListModel, IconTheme,
+    NoSelection,
+};
+use std::path::Path;
 use tracing::{error, warn};
 
 glib::wrapper! {
@@ -83,12 +88,12 @@ impl RnAppWindow {
         self.imp().main_header.get()
     }
 
-    pub(crate) fn sidebar(&self) -> RnSidebar {
-        self.imp().sidebar.get()
-    }
-
     pub(crate) fn split_view(&self) -> adw::OverlaySplitView {
         self.imp().split_view.get()
+    }
+
+    pub(crate) fn sidebar(&self) -> RnSidebar {
+        self.imp().sidebar.get()
     }
 
     pub(crate) fn overlays(&self) -> RnOverlays {
@@ -269,22 +274,23 @@ impl RnAppWindow {
     }
 
     pub(crate) fn tabs_any_unsaved_changes(&self) -> bool {
-        // self.overlays()
-        //     .tabview()
-        //     .pages()
-        //     .snapshot()
-        //     .iter()
-        //     .map(|o| {
-        //         o.downcast_ref::<adw::TabPage>()
-        //             .unwrap()
-        //             .child()
-        //             .downcast_ref::<RnCanvasWrapper>()
-        //             .unwrap()
-        //             .canvas()
-        //     })
-        //     .any(|c| c.unsaved_changes())
+        //     self.overlays()
+        //         .tabview()
+        //         .pages()
+        //         .snapshot()
+        //         .iter()
+        //         .map(|o| {
+        //             o.downcast_ref::<adw::TabPage>()
+        //                 .unwrap()
+        //                 .child()
+        //                 .downcast_ref::<RnCanvasWrapper>()
+        //                 .unwrap()
+        //                 .canvas()
+        //         })
+        //         .any(|c| c.unsaved_changes())
         true
     }
+
     pub(crate) fn tabs_any_saves_in_progress(&self) -> bool {
         // self.overlays()
         //     .tabview()
@@ -318,13 +324,13 @@ impl RnAppWindow {
             .map(|o| o.downcast::<adw::TabPage>().unwrap())
             .filter(|p| !p.is_selected())
         {
-            //     let canvas = inactive_page
-            //         .child()
-            //         .downcast::<RnCanvasWrapper>()
-            //         .unwrap()
-            //         .canvas();
-            //     // no need to handle the widget flags, since the tabs become inactive
-            //     let _ = canvas.engine_mut().set_active(false);
+            // let canvas = inactive_page
+            //     .child()
+            //     .downcast::<RnCanvasWrapper>()
+            //     .unwrap()
+            //     .canvas();
+            // // no need to handle the widget flags, since the tabs become inactive
+            // let _ = canvas.engine_mut().set_active(false);
         }
     }
 
@@ -347,12 +353,12 @@ impl RnAppWindow {
 
     // pub(crate) fn refresh_titles(&self, canvas: &RnCanvas) {
     //     // Titles
-    //     // let title = canvas.doc_title_display();
-    //     // let subtitle = canvas.doc_folderpath_display();
+    //     let title = canvas.doc_title_display();
+    //     let subtitle = canvas.doc_folderpath_display();
 
-    //     // self.set_title(Some(
-    //     //     &(title.clone() + " - " + config::APP_NAME_CAPITALIZED),
-    //     // ));
+    //     self.set_title(Some(
+    //         &(title.clone() + " - " + config::APP_NAME_CAPITALIZED),
+    //     ));
 
     //     self.main_header()
     //         .main_title_unsaved_indicator()
@@ -367,8 +373,8 @@ impl RnAppWindow {
     //             .remove_css_class("unsaved_changes");
     //     }
 
-    //     // self.main_header().main_title().set_title(&title);
-    //     // self.main_header().main_title().set_subtitle(&subtitle);
+    //     self.main_header().main_title().set_title(&title);
+    //     self.main_header().main_title().set_subtitle(&subtitle);
     // }
 
     /// Open the file, with import dialogs when appropriate.
@@ -394,6 +400,8 @@ impl RnAppWindow {
             }
             Err(e) => {
                 error!("Opening file with dialogs failed, Err: {e:?}");
+
+                self.overlays().dispatch_toast_error("Opening file failed");
                 self.overlays().progressbar_abort();
             }
         }
@@ -431,8 +439,12 @@ impl RnAppWindow {
 
         Ok(file_imported)
     }
+
     /// Refresh the UI from the engine state from the given tab page.
-    pub(crate) fn refresh_ui_from_engine(&self, active_tab: &RnCanvasWrapper) {}
+    pub(crate) fn refresh_ui_from_engine(&self, active_tab: &RnCanvasWrapper) {
+        // self.sidebar().settings_panel().refresh_ui(active_tab);
+        // self.refresh_titles(&canvas);
+    }
 
     /// Sync the state from the previous active tab and the current one. Used when the selected tab changes.
     pub(crate) fn sync_state_between_tabs(
@@ -443,5 +455,112 @@ impl RnAppWindow {
         if *prev_tab == *active_tab {
             return;
         }
+        // let prev_canvas_wrapper =
+        //     prev_tab.child().downcast::<RnCanvasWrapper>().unwrap();
+        // let prev_canvas = prev_canvas_wrapper.canvas();
+        // let active_canvas_wrapper =
+        //     active_tab.child().downcast::<RnCanvasWrapper>().unwrap();
+        // let active_canvas = active_canvas_wrapper.canvas();
+
+        // let mut widget_flags = active_canvas.engine_mut().load_engine_config_sync_tab(
+        //     prev_canvas.engine_ref().extract_engine_config(),
+        //     crate::env::pkg_data_dir().ok(),
+        // );
+        // // The visual-debug field is not saved in the config, but we want to sync its value between tabs.
+        // widget_flags |= active_canvas
+        //     .engine_mut()
+        //     .set_visual_debug(prev_canvas.engine_mut().visual_debug());
+
+        // self.handle_widget_flags(widget_flags, &active_canvas);
+    }
+    fn set_filter(&self) {
+        self.imp()
+            .current_filter_model
+            .borrow()
+            .clone()
+            .expect("`current_filter_model` should be set in `set_current_collection`.")
+            .set_filter(self.filter().as_ref());
+    }
+    // ANCHOR_END: helper
+
+    fn filter(&self) -> Option<CustomFilter> {
+        // Get filter state from settings
+        let filter_state: String = self.app().app_settings()?.get("filter");
+
+        // Create custom filters
+        let filter_open = CustomFilter::new(|obj| {
+            // Get `TaskObject` from `glib::Object`
+            let task_object = obj
+                .downcast_ref::<TaskObject>()
+                .expect("The object needs to be of type `TaskObject`.");
+
+            // Only allow completed tasks
+            !task_object.is_completed()
+        });
+        let filter_done = CustomFilter::new(|obj| {
+            // Get `TaskObject` from `glib::Object`
+            let task_object = obj
+                .downcast_ref::<TaskObject>()
+                .expect("The object needs to be of type `TaskObject`.");
+
+            // Only allow done tasks
+            task_object.is_completed()
+        });
+
+        // Return the correct filter
+        match filter_state.as_str() {
+            "All" => None,
+            "Open" => Some(filter_open),
+            "Done" => Some(filter_done),
+            _ => unreachable!(),
+        }
+    }
+    pub(crate) fn set_current_collection(&self, collection: CollectionObject) {
+        // Wrap model with filter and selection and pass it to the list box
+        let tasks = collection.tasks();
+        let filter_model = FilterListModel::new(Some(tasks.clone()), self.filter());
+        let selection_model = NoSelection::new(Some(filter_model.clone()));
+        let wrapper = RnCanvasWrapper::new();
+        // wrapper.imp().tasks_list.bind_model(
+        //     Some(&selection_model),
+        //     clone!(
+        //         #[weak(rename_to = window)]
+        //         self,
+        //         #[upgrade_or_panic]
+        //         move |obj| {
+        //             let task_object = obj
+        //                 .downcast_ref()
+        //                 .expect("The object should be of type `TaskObject`.");
+        //             let row = window.create_task_row(task_object);
+        //             row.upcast()
+        //         }
+        //     ),
+        // );
+
+        // Store filter model
+        self.imp().current_filter_model.replace(Some(filter_model));
+
+        // If present, disconnect old `tasks_changed` handler
+        // if let Some(handler_id) = wrapper.imp().tasks_changed_handler_id.take() {
+        //     self.tasks().disconnect(handler_id);
+        // }
+
+        // Assure that the task list is only visible when it is supposed to
+        // self.set_task_list_visible(&tasks);
+        // let tasks_changed_handler_id = tasks.connect_items_changed(clone!(
+        //     #[weak(rename_to = window)]
+        //     self,
+        //     move |tasks, _, _, _| {
+        //         window.set_task_list_visible(tasks);
+        //     }
+        // ));
+        // self.imp()
+        //     .tasks_changed_handler_id
+        //     .replace(Some(tasks_changed_handler_id));
+
+        // // Set current tasks
+        // self.imp().current_collection.replace(Some(collection));
+
+        // self.select_collection_row();
     }
 }

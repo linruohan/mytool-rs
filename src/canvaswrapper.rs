@@ -2,8 +2,8 @@
 use crate::RnAppWindow;
 use gtk::{
     gdk, glib, glib::clone, prelude::*, subclass::prelude::*, CompositeTemplate,
-    CornerType, EventControllerMotion, EventControllerScroll,
-    EventControllerScrollFlags, GestureDrag, GestureLongPress, GestureZoom,
+    CornerType, Entry, EventControllerMotion, EventControllerScroll,
+    EventControllerScrollFlags, GestureDrag, GestureLongPress, GestureZoom, ListBox,
     PropagationPhase, ScrolledWindow, Widget,
 };
 use once_cell::sync::Lazy;
@@ -47,6 +47,10 @@ mod imp {
         // pub(crate) canvas: TemplateChild<RnCanvas>,
         // #[template_child]
         // pub(crate) contextmenu: TemplateChild<RnContextMenu>,
+        #[template_child]
+        pub entry: TemplateChild<Entry>,
+        #[template_child]
+        pub tasks_list: TemplateChild<ListBox>,
     }
 
     impl Default for RnCanvasWrapper {
@@ -135,6 +139,8 @@ mod imp {
                 scroller: TemplateChild::<ScrolledWindow>::default(),
                 // canvas: TemplateChild::<RnCanvas>::default(),
                 // contextmenu: TemplateChild::<RnContextMenu>::default(),
+                entry: TemplateChild::<Entry>::default(),
+                tasks_list: TemplateChild::<ListBox>::default(),
             }
         }
     }

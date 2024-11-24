@@ -1,12 +1,20 @@
 // Imports
 use crate::{config, dialogs, RnAppWindow};
 use gtk::{gio, glib, glib::clone, prelude::*, UriLauncher, Window};
-use std::path::PathBuf;
 use tracing::{debug, error};
 
 const CLIPBOARD_INPUT_STREAM_BUFSIZE: usize = 4096;
 
 impl RnAppWindow {
+    /// Boolean actions have no target, and a boolean state. They have a default implementation for the activate signal,
+    /// which requests the state to be inverted, and the default implementation for change_state, which sets the state
+    /// to the request.
+    ///
+    /// We generally want to connect to the change_state signal. (but then have to set the state with
+    /// `action.set_state()`)
+    ///
+    /// We can then either toggle the state through activating the action, or set the state explicitly through
+    /// `action.change_state(<request>)`
     pub(crate) fn setup_actions(&self) {
         let action_fullscreen =
             gio::PropertyAction::new("fullscreen", self, "fullscreened");
@@ -24,13 +32,44 @@ impl RnAppWindow {
         self.add_action(&action_open_appmenu);
         let action_toggle_overview = gio::SimpleAction::new("toggle-overview", None);
         self.add_action(&action_toggle_overview);
+        let action_devel_mode =
+            gio::SimpleAction::new_stateful("devel-mode", None, &false.to_variant());
+        self.add_action(&action_devel_mode);
+        let action_devel_menu = gio::SimpleAction::new("devel-menu", None);
+        self.add_action(&action_devel_menu);
         let action_new_tab = gio::SimpleAction::new("new-tab", None);
         self.add_action(&action_new_tab);
+        let action_filter = gio::SimpleAction::new("filter", None);
+        self.add_action(&action_filter);
+        let action_visual_debug =
+            gio::SimpleAction::new_stateful("visual-debug", None, &false.to_variant());
+        self.add_action(&action_visual_debug);
         let action_righthanded =
             gio::PropertyAction::new("righthanded", self, "righthanded");
         self.add_action(&action_righthanded);
-        let action_clipboard_paste = gio::SimpleAction::new("clipboard-paste", None);
-        self.add_action(&action_clipboard_paste);
+        let action_snap_positions = gio::SimpleAction::new_stateful(
+            "snap-positions",
+            None,
+            &false.to_variant(),
+        );
+        self.add_action(&action_snap_positions);
+        let action_show_format_borders = gio::SimpleAction::new_stateful(
+            "show-format-borders",
+            None,
+            &true.to_variant(),
+        );
+        self.add_action(&action_show_format_borders);
+        let action_show_origin_indicator = gio::SimpleAction::new_stateful(
+            "show-origin-indicator",
+            None,
+            &true.to_variant(),
+        );
+        self.add_action(&action_show_origin_indicator);
+
+        let action_respect_borders =
+            gio::PropertyAction::new("respect-borders", self, "respect-borders");
+        self.add_action(&action_respect_borders);
+
         let action_clipboard_paste_contextmenu =
             gio::SimpleAction::new("clipboard-paste-contextmenu", None);
         self.add_action(&action_clipboard_paste_contextmenu);
@@ -42,6 +81,7 @@ impl RnAppWindow {
         self.add_action(&action_active_tab_move_right);
         let action_active_tab_close = gio::SimpleAction::new("active-tab-close", None);
         self.add_action(&action_active_tab_close);
+
         // Open settings
         action_open_settings.connect_activate(clone!(
             #[weak(rename_to = appwindow)]
@@ -114,6 +154,42 @@ impl RnAppWindow {
             }
         ));
 
+        // Developer mode
+        action_devel_mode.connect_activate(clone!(
+            #[weak]
+            action_devel_menu,
+            #[weak]
+            action_visual_debug,
+            move |action, _| {
+                let state = action.state().unwrap().get::<bool>().unwrap();
+
+                // Enable the devel menu action to reveal it in the app menu
+                action_devel_menu.set_enabled(!state);
+
+                // Always disable visual-debugging when disabling the developer mode
+                if state {
+                    debug!("Disabling developer mode, disabling visual debugging.");
+                    action_visual_debug.change_state(&false.to_variant());
+                }
+                action.change_state(&(!state).to_variant());
+            }
+        ));
+
+        // Developer settings
+        // Its enabled state toggles the visibility of the developer settings menu entry.
+        // Must only be modified inside the devel-mode action
+        action_devel_menu.set_enabled(false);
+
+        // Create page
+        action_new_tab.connect_activate(clone!(
+            #[weak(rename_to=appwindow)]
+            self,
+            move |_, _| {
+                let wrapper = appwindow.new_canvas_wrapper();
+                appwindow.append_wrapper_new_tab(&wrapper);
+            }
+        ));
+
         // Tab actions
         action_active_tab_move_left.connect_activate(clone!(
             #[weak(rename_to=appwindow)]
@@ -156,168 +232,26 @@ impl RnAppWindow {
                 }
             }
         ));
-
-        // Clipboard paste
-        action_clipboard_paste.connect_activate(clone!(
-            #[weak(rename_to=appwindow)]
-            self,
-            move |_, _| {
-                appwindow.clipboard_paste(None);
-            }
-        ));
     }
 
     pub(crate) fn setup_action_accels(&self) {
         let app = self.app();
+
         app.set_accels_for_action("win.active-tab-close", &["<Ctrl>w"]);
         app.set_accels_for_action("win.fullscreen", &["F11"]);
         app.set_accels_for_action("win.keyboard-shortcuts", &["<Ctrl>question"]);
         app.set_accels_for_action("win.toggle-overview", &["<Ctrl><Shift>o"]);
         app.set_accels_for_action("win.open-appmenu", &["F10"]);
-        app.set_accels_for_action("win.new-tab", &["<Ctrl>t"]);
-        app.set_accels_for_action("win.clipboard-paste", &["<Ctrl>v"]);
 
+        app.set_accels_for_action("win.new-tab", &["<Ctrl>t"]);
+        app.set_accels_for_action("win.snap-positions", &["<Ctrl><Shift>p"]);
+        // tasks
+        app.set_accels_for_action("win.filter('All')", &["<Ctrl>a"]);
+        app.set_accels_for_action("win.filter('Open')", &["<Ctrl>o"]);
+        app.set_accels_for_action("win.filter('Done')", &["<Ctrl>d"]);
         // shortcuts for devel build
         if config::PROFILE.to_lowercase().as_str() == "devel" {
             app.set_accels_for_action("win.visual-debug", &["<Ctrl><Shift>v"]);
-        }
-    }
-
-    fn clipboard_paste(&self, target_pos: Option<na::Vector2<f64>>) {
-        let content_formats = self.clipboard().formats();
-
-        // Order matters here, we want to go from specific -> generic, mostly because `text/plain` is contained in other text based formats
-        if content_formats.contain_mime_type("text/uri-list") {
-            glib::spawn_future_local(clone!(
-                #[weak(rename_to=appwindow)]
-                self,
-                async move {
-                    debug!("Recognized clipboard content format: files list");
-
-                    match appwindow.clipboard().read_text_future().await {
-                        Ok(Some(text)) => {
-                            let file_paths = text
-                                .lines()
-                                .filter_map(|line| {
-                                    let file_path =
-                                        if let Ok(path_uri) = url::Url::parse(line) {
-                                            path_uri.to_file_path().ok()?
-                                        } else {
-                                            PathBuf::from(&line)
-                                        };
-
-                                    if file_path.exists() {
-                                        Some(file_path)
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .collect::<Vec<PathBuf>>();
-
-                            for file_path in file_paths {
-                                appwindow
-                                    .open_file_w_dialogs(
-                                        gio::File::for_path(&file_path),
-                                        target_pos,
-                                        true,
-                                    )
-                                    .await;
-                            }
-                        }
-                        Ok(None) => {}
-                        Err(e) => {
-                            error!("Reading clipboard text while pasting clipboard from path failed, Err: {e:?}");
-                        }
-                    }
-                }
-            ));
-        } else if content_formats.contain_mime_type("image/svg+xml") {
-            glib::spawn_future_local(clone!(
-                #[weak(rename_to=appwindow)]
-                self,
-                async move {
-                    debug!("Recognized clipboard content: svg image");
-
-                    match appwindow
-                        .clipboard()
-                        .read_future(
-                            &["image/svg+xml"],
-                            glib::source::Priority::DEFAULT,
-                        )
-                        .await
-                    {
-                        Ok((input_stream, _)) => {
-                            let mut acc = Vec::new();
-                            loop {
-                                match input_stream
-                                    .read_future(
-                                        vec![0; CLIPBOARD_INPUT_STREAM_BUFSIZE],
-                                        glib::source::Priority::DEFAULT,
-                                    )
-                                    .await
-                                {
-                                    Ok((mut bytes, n)) => {
-                                        if n == 0 {
-                                            break;
-                                        }
-                                        acc.append(&mut bytes);
-                                    }
-                                    Err(e) => {
-                                        error!("Failed to read clipboard input stream while pasting as Svg, Err: {e:?}");
-                                        acc.clear();
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if !acc.is_empty() {
-                                match crate::utils::str_from_u8_nul_utf8(&acc) {
-                                Ok(text) => {
-                                    error!(
-                                        "error {text}"
-                                    );
-                                }
-                                Err(e) => error!("Failed to get string from clipboard data while pasting as Svg, Err: {e:?}"),
-                            }
-                            }
-                        }
-                        Err(e) => {
-                            error!(
-                                "Failed to read clipboard data while pasting as Svg, Err: {e:?}"
-                            );
-                        }
-                    };
-                }
-            ));
-        } else if content_formats.contain_mime_type("image/png")
-            || content_formats.contain_mime_type("image/jpeg")
-            || content_formats.contain_mime_type("image/jpg")
-            || content_formats.contain_mime_type("image/tiff")
-            || content_formats.contain_mime_type("image/bmp")
-        {
-            const MIMES: [&str; 5] = [
-                "image/png",
-                "image/jpeg",
-                "image/jpg",
-                "image/tiff",
-                "image/bmp",
-            ];
-            if let Some(mime_type) = MIMES
-                .into_iter()
-                .find(|&mime| content_formats.contain_mime_type(mime))
-            {
-                error!(
-                    "Loading bitmap image bytes failed while pasting clipboard as {mime_type}"
-                );
-            }
-        } else if content_formats.contain_mime_type("text/plain")
-            || content_formats.contain_mime_type("text/plain;charset=utf-8")
-        {
-        } else {
-            debug!(
-                "Failed to paste clipboard, unsupported MIME-type(s): {:?}",
-                content_formats.mime_types()
-            );
         }
     }
 }

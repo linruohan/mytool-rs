@@ -1,23 +1,25 @@
+use crate::collection_object::{CollectionData, CollectionObject};
 // Imports
+use crate::utils::data_path;
 use crate::{config, dialogs, RnMainHeader, RnOverlays, RnSidebar};
 use adw::{prelude::*, subclass::prelude::*};
 use gtk::{
-    gdk, glib, glib::clone, CompositeTemplate, CssProvider, PackType, PadController,
+    gdk, glib, glib::clone, CompositeTemplate, CssProvider, FilterListModel, PackType,
 };
 use once_cell::sync::Lazy;
 use std::cell::{Cell, RefCell};
+use std::fs::File;
 use std::rc::Rc;
-
 #[derive(Debug, CompositeTemplate)]
 #[template(resource = "/com/github/linruohan/mytool/ui/appwindow.ui")]
 pub(crate) struct RnAppWindow {
-    pub(crate) drawing_pad_controller: RefCell<Option<PadController>>,
     pub(crate) autosave_source_id: RefCell<Option<glib::SourceId>>,
     pub(crate) periodic_configsave_source_id: RefCell<Option<glib::SourceId>>,
 
     pub(crate) save_in_progress: Cell<bool>,
     pub(crate) save_in_progress_toast: RefCell<Option<adw::Toast>>,
     pub(crate) autosave: Cell<bool>,
+    pub(crate) current_filter_model: RefCell<Option<FilterListModel>>,
     pub(crate) autosave_interval_secs: Cell<u32>,
     pub(crate) righthanded: Cell<bool>,
     pub(crate) block_pinch_zoom: Cell<bool>,
@@ -41,13 +43,13 @@ pub(crate) struct RnAppWindow {
 impl Default for RnAppWindow {
     fn default() -> Self {
         Self {
-            drawing_pad_controller: RefCell::new(None),
             autosave_source_id: RefCell::new(None),
             periodic_configsave_source_id: RefCell::new(None),
 
             save_in_progress: Cell::new(false),
             save_in_progress_toast: RefCell::new(None),
             autosave: Cell::new(true),
+            current_filter_model: RefCell::new(None),
             autosave_interval_secs: Cell::new(
                 super::RnAppWindow::AUTOSAVE_INTERVAL_DEFAULT,
             ),
@@ -104,7 +106,6 @@ impl ObjectImpl for RnAppWindow {
             gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
         );
 
-        self.setup_input();
         self.setup_overview();
         self.setup_split_view();
         self.setup_tabbar();
@@ -125,6 +126,9 @@ impl ObjectImpl for RnAppWindow {
                     .build(),
                 glib::ParamSpecBoolean::builder("autosave")
                     .default_value(false)
+                    .build(),
+                glib::ParamSpecUInt::builder("task-filter-state")
+                    .default_value(0)
                     .build(),
                 glib::ParamSpecUInt::builder("autosave-interval-secs")
                     .minimum(5)
@@ -252,11 +256,11 @@ impl WindowImpl for RnAppWindow {
             self.close_in_progress.set(true);
             self.main_header.headerbar().set_sensitive(false);
             self.sidebar.headerbar().set_sensitive(false);
-            // obj.overlays().dispatch_toast_text_singleton(
-            //     &gettext("Saves are in progress, waiting before closing.."),
-            //     None,
-            //     &mut self.save_in_progress_toast.borrow_mut(),
-            // );
+            obj.overlays().dispatch_toast_text_singleton(
+                "Saves are in progress, waiting before closing..",
+                None,
+                &mut self.save_in_progress_toast.borrow_mut(),
+            );
         } else if obj.tabs_any_unsaved_changes() {
             glib::spawn_future_local(clone!(
                 #[weak(rename_to=appwindow)]
@@ -268,6 +272,18 @@ impl WindowImpl for RnAppWindow {
         } else {
             obj.close_force();
         }
+
+        let backup_data: Vec<CollectionData> = RnSidebar::new()
+            .collections()
+            .iter::<CollectionObject>()
+            .filter_map(|collection_object| collection_object.ok())
+            .map(|collection_object| collection_object.to_collection_data())
+            .collect();
+
+        // Save state to file
+        let file = File::create(data_path()).expect("Could not create json file.");
+        serde_json::to_writer(file, &backup_data)
+            .expect("Could not write data to json file");
 
         // Inhibit (Overwrite) the default handler. This handler is then responsible for destroying the window.
         glib::Propagation::Stop
@@ -294,7 +310,25 @@ impl RnAppWindow {
                         // save for all tabs opened in the current window that have unsaved changes
                         let tabs = appwindow.get_all_tabs();
 
-                        for (i, tab) in tabs.iter().enumerate() {}
+                        for (i, tab) in tabs.iter().enumerate() {
+                            // let canvas = tab.canvas();
+                            // if canvas.unsaved_changes() {
+                            //     if let Some(output_file) = canvas.output_file() {
+                            //         trace!(
+                            //             "there are unsaved changes on the tab {:?} with a file on disk, saving",i
+                            //         );
+                            //         glib::spawn_future_local(clone!(#[weak] canvas, #[weak] appwindow ,async move {
+                            //             if let Err(e) = canvas.save_document_to_file(&output_file).await {
+                            //                 error!("Saving document failed, Err: `{e:?}`");
+                            //                 canvas.set_output_file(None);
+                            //                 appwindow
+                            //                     .overlays()
+                            //                     .dispatch_toast_error(&gettext("Saving document failed"));
+                            //             };
+                            //         }));
+                            //     }
+                            // }
+                        }
 
                         glib::ControlFlow::Continue
                     }
@@ -303,44 +337,6 @@ impl RnAppWindow {
         ) {
             removed_id.remove();
         }
-    }
-
-    fn setup_input(&self) {
-        let obj = self.obj();
-        let drawing_pad_controller = PadController::new(&*obj, None);
-
-        // drawing_pad_controller.set_action(
-        //     PadActionType::Button,
-        //     0,
-        //     -1,
-        //     &gettext("Button 1"),
-        //     "drawing-pad-pressed-button-0",
-        // );
-        // drawing_pad_controller.set_action(
-        //     PadActionType::Button,
-        //     1,
-        //     -1,
-        //     &gettext("Button 2"),
-        //     "drawing-pad-pressed-button-1",
-        // );
-        // drawing_pad_controller.set_action(
-        //     PadActionType::Button,
-        //     2,
-        //     -1,
-        //     &gettext("Button 3"),
-        //     "drawing-pad-pressed-button-2",
-        // );
-        // drawing_pad_controller.set_action(
-        //     PadActionType::Button,
-        //     3,
-        //     -1,
-        //     &gettext("Button 4"),
-        //     "drawing-pad-pressed-button-3",
-        // );
-
-        obj.add_controller(drawing_pad_controller.clone());
-        self.drawing_pad_controller
-            .replace(Some(drawing_pad_controller));
     }
 
     fn setup_overview(&self) {
@@ -499,11 +495,6 @@ impl RnAppWindow {
             obj.main_header()
                 .right_sidebar_reveal_toggle()
                 .set_visible(false);
-
-            // obj.overlays().sidebar_box().set_halign(Align::Start);
-            // obj.overlays()
-            //     .sidebar_scroller()
-            //     .set_placement(CornerType::TopRight);
         } else {
             obj.split_view().set_sidebar_position(PackType::End);
             obj.main_header()
@@ -512,11 +503,6 @@ impl RnAppWindow {
             obj.main_header()
                 .right_sidebar_reveal_toggle()
                 .set_visible(true);
-
-            // obj.overlays().sidebar_box().set_halign(Align::End);
-            // obj.overlays()
-            //     .sidebar_scroller()
-            //     .set_placement(CornerType::TopLeft);
         }
     }
 }

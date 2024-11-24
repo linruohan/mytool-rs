@@ -5,7 +5,6 @@ use gtk::{glib, glib::clone};
 use tracing::error;
 
 impl RnAppWindow {
-    #[allow(unused)]
     /// Setup settings binds.
     pub(crate) fn setup_settings_binds(&self) -> anyhow::Result<()> {
         let app = self.app();
@@ -29,7 +28,16 @@ impl RnAppWindow {
                 }
             }
         ));
-
+        app_settings.connect_changed(
+            Some("filter"),
+            clone!(
+                #[weak(rename_to = window)]
+                self,
+                move |_, _| {
+                    window.set_filter();
+                }
+            ),
+        );
         app_settings
             .bind("sidebar-show", &self.split_view(), "show-sidebar")
             .get_no_changes()
@@ -53,12 +61,6 @@ impl RnAppWindow {
             .get_no_changes()
             .build();
 
-        // block pinch zoom
-        app_settings
-            .bind("block-pinch-zoom", self, "block-pinch-zoom")
-            .get_no_changes()
-            .build();
-
         // respect borders
         app_settings
             .bind("respect-borders", self, "respect-borders")
@@ -67,7 +69,7 @@ impl RnAppWindow {
 
         Ok(())
     }
-    #[allow(unused)]
+
     /// Load settings that are not bound as binds.
     ///
     /// Settings changes through gsettings / dconf might not be applied until the app restarts.
@@ -95,11 +97,17 @@ impl RnAppWindow {
                 .activate_action("color-scheme", Some(&color_scheme.to_variant()));
         }
 
-        // Workspaces bar
+        // {
+        //     // Workspaces bar
+        //     self.sidebar()
+        //         .workspacebrowser()
+        //         .workspacesbar()
+        //         .load_from_settings(&app_settings);
+        // }
 
         Ok(())
     }
-    #[allow(unused)]
+
     /// Save settings that are not bound as binds.
     pub(crate) fn save_to_settings(&self) -> anyhow::Result<()> {
         let app = self.app();
@@ -116,13 +124,24 @@ impl RnAppWindow {
             }
         }
 
-        // Save engine config of the current active tab
+        // {
+        //     // Save engine config of the current active tab
+        //     if let Some(canvas) = self.active_tab_canvas() {
+        //         canvas.save_engine_config(&app_settings)?;
+        //     }
+        // }
 
-        // Workspaces list
+        // {
+        //     // Workspaces list
+        //     self.sidebar()
+        //         .workspacebrowser()
+        //         .workspacesbar()
+        //         .save_to_settings(&app_settings);
+        // }
 
         Ok(())
     }
-    #[allow(unused)]
+
     pub(crate) fn setup_periodic_save(&self) -> anyhow::Result<()> {
         let app = self.app();
         let app_settings = app
@@ -142,7 +161,18 @@ impl RnAppWindow {
                     self,
                     #[upgrade_or]
                     glib::ControlFlow::Break,
-                    move || { glib::ControlFlow::Continue }
+                    move || {
+                        // let Some(canvas) = appwindow.active_tab_canvas() else {
+                        //     return glib::ControlFlow::Continue;
+                        // };
+                        // if let Err(e) = canvas.save_engine_config(&app_settings) {
+                        //     error!(
+                        //         "Saving engine config in periodic save task failed , Err: {e:?}"
+                        //     );
+                        // }
+
+                        glib::ControlFlow::Continue
+                    }
                 ),
             ))
         {
