@@ -272,18 +272,10 @@ impl WindowImpl for RnAppWindow {
         } else {
             obj.close_force();
         }
-
-        let backup_data: Vec<CollectionData> = RnTodo::new()
-            .collections()
-            .iter::<CollectionObject>()
-            .filter_map(|collection_object| collection_object.ok())
-            .map(|collection_object| collection_object.to_collection_data())
-            .collect();
-
-        // Save state to file
-        let file = File::create(data_path()).expect("Could not create json file.");
-        serde_json::to_writer(file, &backup_data)
-            .expect("Could not write data to json file");
+        // 保存 collections
+        if let Some(wrapper) = self.obj().active_tab_wrapper() {
+            wrapper.save_collections();
+        }
 
         // Inhibit (Overwrite) the default handler. This handler is then responsible for destroying the window.
         glib::Propagation::Stop

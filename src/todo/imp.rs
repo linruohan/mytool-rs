@@ -1,6 +1,5 @@
-use std::cell::RefCell;
-use std::fs::File;
-
+use crate::collection_object::{CollectionData, CollectionObject};
+use crate::utils::data_path;
 use adw::subclass::prelude::*;
 use adw::{prelude::*, NavigationSplitView};
 use glib::subclass::InitializingObject;
@@ -9,9 +8,8 @@ use gtk::{
     gio, glib, CompositeTemplate, Entry, FilterListModel, ListBox, Stack, Widget,
 };
 use std::cell::OnceCell;
-
-use crate::collection_object::{CollectionData, CollectionObject};
-use crate::utils::data_path;
+use std::cell::RefCell;
+use std::fs::File;
 
 // ANCHOR: struct
 // Object holding the state
@@ -102,27 +100,3 @@ impl ObjectImpl for RnTodo {
 
 // Trait shared by all widgets
 impl WidgetImpl for RnTodo {}
-
-// ANCHOR: window_impl
-// Trait shared by all windows
-impl WindowImpl for RnTodo {
-    fn close_request(&self) -> glib::Propagation {
-        // Store task data in vector
-        let backup_data: Vec<CollectionData> = self
-            .obj()
-            .collections()
-            .iter::<CollectionObject>()
-            .filter_map(|collection_object| collection_object.ok())
-            .map(|collection_object| collection_object.to_collection_data())
-            .collect();
-
-        // Save state to file
-        let file = File::create(data_path()).expect("Could not create json file.");
-        serde_json::to_writer_pretty(file, &backup_data)
-            .expect("Could not write data to json file");
-
-        // Pass close request on to the parent
-        self.parent_close_request()
-    }
-}
-// ANCHOR_END: window_impl

@@ -6,7 +6,7 @@ mod imp;
 // Imports
 use crate::{
     collection_object::CollectionObject, config, dialogs, task_object::TaskObject,
-    FileType, RnApp, RnCanvasWrapper, RnMainHeader, RnOverlays, RnSidebar,
+    FileType, RnApp, RnMainHeader, RnOverlays, RnSidebar, RnTodo,
 };
 use adw::{prelude::*, subclass::prelude::*};
 use gtk::{
@@ -163,7 +163,7 @@ impl RnAppWindow {
         for tab in self
             .tabs_snapshot()
             .into_iter()
-            .map(|p| p.child().downcast::<RnCanvasWrapper>().unwrap())
+            .map(|p| p.child().downcast::<RnTodo>().unwrap())
         {
             // let _ = tab.canvas().engine_mut().set_active(false);
             // tab.canvas()
@@ -185,7 +185,7 @@ impl RnAppWindow {
     }
 
     /// Returns a vector of all tabs of the current windows
-    pub(crate) fn get_all_tabs(&self) -> Vec<RnCanvasWrapper> {
+    pub(crate) fn get_all_tabs(&self) -> Vec<RnTodo> {
         let n_tabs = self.n_tabs_open();
         let mut tabs = Vec::with_capacity(n_tabs);
 
@@ -200,7 +200,7 @@ impl RnAppWindow {
                 .downcast::<adw::TabPage>()
                 .unwrap()
                 .child()
-                .downcast::<crate::RnCanvasWrapper>()
+                .downcast::<crate::RnTodo>()
                 .unwrap();
             tabs.push(wrapper);
         }
@@ -208,9 +208,9 @@ impl RnAppWindow {
     }
 
     /// Get the active (selected) tab page child.
-    pub(crate) fn active_tab_wrapper(&self) -> Option<RnCanvasWrapper> {
+    pub(crate) fn active_tab_wrapper(&self) -> Option<RnTodo> {
         self.active_tab_page()
-            .map(|c| c.child().downcast::<RnCanvasWrapper>().unwrap())
+            .map(|c| c.child().downcast::<RnTodo>().unwrap())
     }
 
     /// Get the active (selected) tab page canvas.
@@ -220,7 +220,7 @@ impl RnAppWindow {
 
     /// adds the initial tab to the tabview
     fn add_initial_tab(&self) -> adw::TabPage {
-        let wrapper = RnCanvasWrapper::new();
+        let wrapper = RnTodo::new();
         if let Some(app_settings) = self.app().app_settings() {
             // if let Err(e) = wrapper
             //     .canvas()
@@ -237,12 +237,12 @@ impl RnAppWindow {
     }
 
     /// Creates a new canvas wrapper without attaching it as a tab.
-    pub(crate) fn new_canvas_wrapper(&self) -> RnCanvasWrapper {
+    pub(crate) fn new_canvas_wrapper(&self) -> RnTodo {
         // let engine_config = self
         //     .active_tab_wrapper()
         //     .map(|w| w.canvas().engine_ref().extract_engine_config())
         //     .unwrap_or_default();
-        let wrapper = RnCanvasWrapper::new();
+        let wrapper = RnTodo::new();
         // let widget_flags = wrapper
         //     .canvas()
         //     .engine_mut()
@@ -252,10 +252,7 @@ impl RnAppWindow {
     }
 
     /// Append the wrapper as a new tab and set it selected.
-    pub(crate) fn append_wrapper_new_tab(
-        &self,
-        wrapper: &RnCanvasWrapper,
-    ) -> adw::TabPage {
+    pub(crate) fn append_wrapper_new_tab(&self, wrapper: &RnTodo) -> adw::TabPage {
         // The tab page connections are handled in page_attached,
         // which is emitted when the page is added to the tabview.
         let page = self.overlays().tabview().append(wrapper);
@@ -288,7 +285,7 @@ impl RnAppWindow {
         //                 .canvas()
         //         })
         //         .any(|c| c.unsaved_changes())
-        true
+        false
     }
 
     pub(crate) fn tabs_any_saves_in_progress(&self) -> bool {
@@ -306,7 +303,7 @@ impl RnAppWindow {
         //             .canvas()
         //     })
         //     .any(|c| c.save_in_progress())
-        true
+        false
     }
 
     /// Set all unselected tabs inactive.
@@ -441,7 +438,7 @@ impl RnAppWindow {
     }
 
     /// Refresh the UI from the engine state from the given tab page.
-    pub(crate) fn refresh_ui_from_engine(&self, active_tab: &RnCanvasWrapper) {
+    pub(crate) fn refresh_ui_from_engine(&self, active_tab: &RnTodo) {
         // self.sidebar().settings_panel().refresh_ui(active_tab);
         // self.refresh_titles(&canvas);
     }

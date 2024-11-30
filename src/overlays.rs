@@ -1,5 +1,5 @@
 // Imports
-use crate::{dialogs, RnAppWindow, RnCanvasWrapper};
+use crate::{dialogs, RnAppWindow, RnTodo};
 use core::time::Duration;
 use gtk::{
     gio, glib, glib::clone, prelude::*, subclass::prelude::*, CompositeTemplate,
@@ -117,10 +117,8 @@ impl RnOverlays {
                 let Some(active_tab_page) = appwindow.active_tab_page() else {
                     return;
                 };
-                let active_canvaswrapper = active_tab_page
-                    .child()
-                    .downcast::<RnCanvasWrapper>()
-                    .unwrap();
+                let active_canvaswrapper =
+                    active_tab_page.child().downcast::<RnTodo>().unwrap();
                 appwindow.tabs_set_unselected_inactive();
 
                 if let Some(prev_active_tab_page) =
@@ -150,7 +148,7 @@ impl RnOverlays {
             #[weak]
             appwindow,
             move |_, page, _| {
-                let canvaswrapper = page.child().downcast::<RnCanvasWrapper>().unwrap();
+                let canvaswrapper = page.child().downcast::<RnTodo>().unwrap();
                 canvaswrapper.init_reconnect(&appwindow);
                 canvaswrapper.connect_to_tab_page(page);
                 // let widget_flags = canvaswrapper.canvas().engine_mut().set_active(true);
@@ -162,7 +160,7 @@ impl RnOverlays {
             #[weak(rename_to=overlays)]
             self,
             move |_, page, _| {
-                let canvaswrapper = page.child().downcast::<RnCanvasWrapper>().unwrap();
+                let canvaswrapper = page.child().downcast::<RnTodo>().unwrap();
 
                 // // if the to be detached page was the active (selected), remove it.
                 if overlays

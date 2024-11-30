@@ -5,7 +5,6 @@ use std::fs::File;
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use adw::{ActionRow, AlertDialog, ResponseAppearance};
-use gio::Settings;
 use glib::clone;
 use gtk::{
     gio, glib, pango, Align, CheckButton, CustomFilter, Entry, FilterListModel, Label,
@@ -13,7 +12,6 @@ use gtk::{
 };
 
 use crate::collection_object::{CollectionData, CollectionObject};
-use crate::config::APP_ID;
 use crate::task_object::TaskObject;
 use crate::utils::data_path;
 use crate::RnAppWindow;
@@ -357,7 +355,19 @@ impl RnTodo {
             }
         }
     }
-
+    pub(crate) fn save_collections(&self) {
+        println!("start save collections: {:?}", data_path());
+        let backup_data: Vec<CollectionData> = self
+            .collections()
+            .iter::<CollectionObject>()
+            .filter_map(|collection_object| collection_object.ok())
+            .map(|collection_object| collection_object.to_collection_data())
+            .collect();
+        // Save state to file
+        let file = File::create(data_path()).expect("Could not create json file.");
+        serde_json::to_writer_pretty(file, &backup_data)
+            .expect("Could not write data to json file");
+    }
     // ANCHOR: new_collection
     async fn new_collection(&self) {
         // Create entry
@@ -420,6 +430,73 @@ impl RnTodo {
 
         // Show the content
         self.imp().split_view.set_show_content(true);
+    }
+
+    pub(crate) fn init_reconnect(&self, appwindow: &RnAppWindow) {
+        // self.imp().canvas.init_reconnect(appwindow);
+
+        // let appwindow_block_pinch_zoom_bind = appwindow
+        //     .bind_property("block-pinch-zoom", self, "block_pinch_zoom")
+        //     .sync_create()
+        //     .build();
+
+        // let appwindow_righthanded_bind = appwindow
+        //     .bind_property("righthanded", &self.scroller(), "window-placement")
+        //     .transform_to(|_, righthanded: bool| {
+        //         if righthanded {
+        //             Some(CornerType::BottomRight)
+        //         } else {
+        //             Some(CornerType::BottomLeft)
+        //         }
+        //     })
+        //     .sync_create()
+        //     .build();
+
+        // let mut connections = self.imp().connections.borrow_mut();
+        // if let Some(old) = connections
+        //     .appwindow_block_pinch_zoom_bind
+        //     .replace(appwindow_block_pinch_zoom_bind)
+        // {
+        //     old.unbind()
+        // }
+
+        // if let Some(old) = connections
+        //     .appwindow_righthanded_bind
+        //     .replace(appwindow_righthanded_bind)
+        // {
+        //     old.unbind();
+        // }
+    }
+
+    /// This disconnects all connections with references to external objects,
+    /// to prepare moving the widget to another appwindow.
+    ///
+    /// The same method of the canvas child is chained up in here.
+    pub(crate) fn disconnect_connections(&self) {
+        // self.canvas().disconnect_connections();
+
+        // let mut connections = self.imp().connections.borrow_mut();
+        // if let Some(old) = connections.appwindow_block_pinch_zoom_bind.take() {
+        //     old.unbind();
+        // }
+        // if let Some(old) = connections.appwindow_show_scrollbars_bind.take() {
+        //     old.unbind();
+        // }
+        // if let Some(old) = connections.appwindow_inertial_scrolling_bind.take() {
+        //     old.unbind();
+        // }
+        // if let Some(old) = connections.appwindow_righthanded_bind.take() {
+        //     old.unbind();
+        // }
+    }
+    #[allow(unused)]
+    /// When the widget is the child of a tab page, we want to connect the title, icons, ..
+    ///
+    /// disconnects existing connections to old tab pages.
+    ///
+    /// The same method of the canvas child is chained up in here.
+    pub(crate) fn connect_to_tab_page(&self, page: &adw::TabPage) {
+        // self.canvas().connect_to_tab_page(page);
     }
     // ANCHOR_END: new_collection
 }
