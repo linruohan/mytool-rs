@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/mytool">
+    <comment>Mytool notes file type</comment>
+    <glob pattern="*.mt"/>
+    <generic-icon name="application-@APP_NAME@"/>
+  </mime-type>
+</mime-info>

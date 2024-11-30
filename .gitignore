@@ -12,6 +12,7 @@
 /.flatpak-builder
 /.editorconfig
 /.vscode
+src/config.rs
 *.mo
 *.code-workspace
 .idea/

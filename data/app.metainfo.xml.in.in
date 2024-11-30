@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Felix Zwettler 2022 <f.zwettler@posteo.de> -->
+<component type="desktop-application">
+  <id>@APP_ID@</id>
+  <metadata_license>CC0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name translatable="no">@APP_NAME_CAPITALIZED@</name>
+  <launchable type="desktop-id">@APP_ID@.desktop</launchable>
+  <summary>Sketch and take handwritten notes</summary>
+
+  <categories>
+    <category>Graphics</category>
+    <category>Education</category>
+    <category>Office</category>
+    <category>VectorGraphics</category>
+    <category>GNOME</category>
+    <category>GTK</category>
+  </categories>
+
+  <description>
+    <p>
+      Mytool is my tool of whritten by rust.
+    </p>
+  </description>
+
+  <screenshots>
+    <screenshot>
+      <img id="avatar-change" thumbnail="200" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAABLCAYAAAA4TnrqAAABdklEQVR4Xu3YMWoCURhF4V9EsBVLK7Wychmp0mcNLiKpswGzBbcQXYWNpkulESQYLIyg0YAreMcZmBk41mfwvW8uFtbWz71r+EkSqImV5HSLxEq3EgtYiSUWEQCtv1liAQGQuiyxgABIXZZYQACkLkssIABSlyUWEACpyxILCIDUZYkFBEDqssQCAiB1WWIBAZC6LLGAAEhdVhWwWk/jaA4ebkc9Lt9jNxmBYxeTFrYsscALF0ssIABSlyUWEACpyxILCIDUZYkFBEDqssQCAiB1WWIBAZC6LLGAAEhdllhAAKQuSywgANIsy2p0hnFazcG35ZOW4j/46+9PXA67pBvV2904bxaxfXtM6vOMSoF1z4W+Xvr3PJbpmUpi/X1/xn76GsePWabL04cLw6IHLUMvFngLYokFBEDqssQCAiB1WWIBAZC6LLGAAEhdllhAAKQuSywgAFKXJRYQAKnLEgsIgNRliQUEQOqyxAICIHVZYgEBkP4D1NNWUmt56YgAAAAASUVORK5CYII=" alt="linruohan-linruohan"></img>
+      <caption>Configure action shortcuts</caption>
+    </screenshot>
+  </screenshots>
+
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+    <control>tablet</control>
+    <display_length compare="ge">500</display_length>
+  </recommends>
+
+  <url type="homepage">@APP_WEBSITE@</url>
+  <url type="bugtracker">@APP_ISSUES_URL@</url>
+  <url type="donation">@APP_DONATE_URL@</url>
+  <developer_name translatable="no">@APP_AUTHOR_NAME@</developer_name>
+  <update_contact>f.zwettler@posteo.de</update_contact>
+  <content_rating type="oars-1.0" />
+
+  <provides>
+    <binary>@APP_NAME@</binary>
+  </provides>
+
+  <!-- The changelog should not be translated -->
+  <releases>
+    <release version="0.1.0" date="2021-09-30">
+      <description>
+        <p>The initial release</p>
+        <ul>
+          <li>feat: add disable option for pen shortcuts (thanks to @Doublonmousse)</li>
+          <li>improv: migrate to libadwaita based dialogs (thanks to @zefr0x)</li>
+          <li>fix: pen state becoming incorrect on windows (thanks to @Doublonmousse)</li>
+          <li>fix: hover state for typewriter move/resize nodes</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+  <branding>
+    <color type="primary" scheme_preference="light">#ffbe6f</color>
+    <color type="primary" scheme_preference="dark">#613583</color>
+  </branding>
+</component>
