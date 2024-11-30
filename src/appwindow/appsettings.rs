@@ -1,7 +1,10 @@
 // Imports
-use crate::appwindow::RnAppWindow;
+use crate::{appwindow::RnAppWindow, task_object::TaskObject, RnTodo};
 use adw::{prelude::*, subclass::prelude::*};
-use gtk::{glib, glib::clone};
+use gtk::{
+    glib::{self, clone},
+    CustomFilter,
+};
 use tracing::error;
 
 impl RnAppWindow {

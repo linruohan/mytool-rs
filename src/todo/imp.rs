@@ -3,10 +3,11 @@ use std::fs::File;
 
 use adw::subclass::prelude::*;
 use adw::{prelude::*, NavigationSplitView};
-use gio::Settings;
 use glib::subclass::InitializingObject;
 use gtk::glib::SignalHandlerId;
-use gtk::{gio, glib, CompositeTemplate, Entry, FilterListModel, ListBox, Stack};
+use gtk::{
+    gio, glib, CompositeTemplate, Entry, FilterListModel, ListBox, Stack, Widget,
+};
 use std::cell::OnceCell;
 
 use crate::collection_object::{CollectionData, CollectionObject};
@@ -14,10 +15,9 @@ use crate::utils::data_path;
 
 // ANCHOR: struct
 // Object holding the state
-#[derive(Debug, CompositeTemplate, Default)]
-#[template(resource = "/com/github/linruohan/mytool/ui/window.ui")]
-pub struct Window {
-    pub settings: OnceCell<Settings>,
+#[derive(Debug, CompositeTemplate)]
+#[template(resource = "/com/github/linruohan/mytool/ui/todo.ui")]
+pub(crate) struct RnTodo {
     #[template_child]
     pub entry: TemplateChild<Entry>,
     #[template_child]
@@ -35,15 +35,30 @@ pub struct Window {
     pub tasks_changed_handler_id: RefCell<Option<SignalHandlerId>>,
 }
 // ANCHOR_END: struct
-
+impl Default for RnTodo {
+    fn default() -> Self {
+        Self {
+            entry: TemplateChild::<Entry>::default(),
+            tasks_list: TemplateChild::<ListBox>::default(),
+            // 👇 all members below are new
+            collections_list: TemplateChild::<ListBox>::default(),
+            split_view: TemplateChild::<NavigationSplitView>::default(),
+            stack: TemplateChild::<Stack>::default(),
+            collections: OnceCell::<gio::ListStore>::default(),
+            current_collection: RefCell::<Option<CollectionObject>>::default(),
+            current_filter_model: RefCell::<Option<FilterListModel>>::default(),
+            tasks_changed_handler_id: RefCell::<Option<SignalHandlerId>>::default(),
+        }
+    }
+}
 // ANCHOR: object_subclass
 // The central trait for subclassing a GObject
 #[glib::object_subclass]
-impl ObjectSubclass for Window {
+impl ObjectSubclass for RnTodo {
     // `NAME` needs to match `class` attribute of template
-    const NAME: &'static str = "TodoWindow";
-    type Type = super::Window;
-    type ParentType = adw::ApplicationWindow;
+    const NAME: &'static str = "RnTodo";
+    type Type = super::RnTodo;
+    type ParentType = Widget;
 
     fn class_init(klass: &mut Self::Class) {
         klass.bind_template();
@@ -71,28 +86,26 @@ impl ObjectSubclass for Window {
 
 // ANCHOR: object_impl
 // Trait shared by all GObjects
-impl ObjectImpl for Window {
+impl ObjectImpl for RnTodo {
     fn constructed(&self) {
         // Call "constructed" on parent
         self.parent_constructed();
 
         // Setup
-        let obj = self.obj();
-        obj.setup_settings();
+        let obj: glib::BorrowedObject<'_, super::RnTodo> = self.obj();
         obj.setup_collections();
         obj.restore_data();
         obj.setup_callbacks();
-        obj.setup_actions();
     }
 }
 // ANCHOR_END: object_impl
 
 // Trait shared by all widgets
-impl WidgetImpl for Window {}
+impl WidgetImpl for RnTodo {}
 
 // ANCHOR: window_impl
 // Trait shared by all windows
-impl WindowImpl for Window {
+impl WindowImpl for RnTodo {
     fn close_request(&self) -> glib::Propagation {
         // Store task data in vector
         let backup_data: Vec<CollectionData> = self
@@ -113,9 +126,3 @@ impl WindowImpl for Window {
     }
 }
 // ANCHOR_END: window_impl
-
-// Trait shared by all application windows
-impl ApplicationWindowImpl for Window {}
-
-// Trait shared by all adwaita application windows
-impl AdwApplicationWindowImpl for Window {}

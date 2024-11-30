@@ -6,43 +6,26 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use adw::{ActionRow, AlertDialog, ResponseAppearance};
 use gio::Settings;
-use glib::{clone, Object};
+use glib::clone;
 use gtk::{
     gio, glib, pango, Align, CheckButton, CustomFilter, Entry, FilterListModel, Label,
-    ListBoxRow, NoSelection,
+    ListBoxRow, NoSelection, Widget,
 };
 
 use crate::collection_object::{CollectionData, CollectionObject};
 use crate::config::APP_ID;
 use crate::task_object::TaskObject;
 use crate::utils::data_path;
+use crate::RnAppWindow;
 
 glib::wrapper! {
-    pub struct Window(ObjectSubclass<imp::Window>)
-        @extends adw::ApplicationWindow, gtk::ApplicationWindow, gtk::Window, gtk::Widget,
-        @implements gio::ActionGroup, gio::ActionMap, gtk::Accessible, gtk::Buildable,
-                    gtk::ConstraintTarget, gtk::Native, gtk::Root, gtk::ShortcutManager;
+    pub(crate) struct RnTodo(ObjectSubclass<imp::RnTodo>)
+    @extends Widget;
 }
 
-impl Window {
-    pub fn new(app: &adw::Application) -> Self {
-        // Create new window
-        Object::builder().property("application", app).build()
-    }
-
-    fn setup_settings(&self) {
-        let settings = Settings::new(APP_ID);
-        self.imp()
-            .settings
-            .set(settings)
-            .expect("`settings` should not be set before calling `setup_settings`.");
-    }
-
-    fn settings(&self) -> &Settings {
-        self.imp()
-            .settings
-            .get()
-            .expect("`settings` should be set in `setup_settings`.")
+impl RnTodo {
+    pub fn new() -> Self {
+        glib::Object::new()
     }
 
     // ANCHOR: helper
@@ -58,7 +41,7 @@ impl Window {
             .expect("`current_collection` should be set in `set_current_collections`.")
     }
 
-    fn collections(&self) -> gio::ListStore {
+    pub(crate) fn collections(&self) -> gio::ListStore {
         self.imp()
             .collections
             .get()
@@ -66,7 +49,7 @@ impl Window {
             .clone()
     }
 
-    fn set_filter(&self) {
+    pub(crate) fn set_filter(&self) {
         self.imp()
             .current_filter_model
             .borrow()
@@ -78,7 +61,7 @@ impl Window {
 
     fn filter(&self) -> Option<CustomFilter> {
         // Get filter state from settings
-        let filter_state: String = self.settings().get("filter");
+        let filter_state: String = "All".to_owned();
 
         // Create custom filters
         let filter_open = CustomFilter::new(|obj| {
@@ -294,16 +277,16 @@ impl Window {
 
         // ANCHOR: setup_callbacks
         // Filter model whenever the value of the key "filter" changes
-        self.settings().connect_changed(
-            Some("filter"),
-            clone!(
-                #[weak(rename_to = window)]
-                self,
-                move |_, _| {
-                    window.set_filter();
-                }
-            ),
-        );
+        // self.settings().connect_changed(
+        //     Some("filter"),
+        //     clone!(
+        //         #[weak(rename_to = window)]
+        //         self,
+        //         move |_, _| {
+        //             window.set_filter();
+        //         }
+        //     ),
+        // );
 
         // Setup callback when items of collections change
         self.set_stack();
@@ -356,12 +339,6 @@ impl Window {
         // Add new task to model
         let task = TaskObject::new(false, content);
         self.tasks().append(&task);
-    }
-
-    fn setup_actions(&self) {
-        // Create action from key "filter" and add to action group "win"
-        let action_filter = self.settings().create_action("filter");
-        self.add_action(&action_filter);
     }
 
     fn remove_done_tasks(&self) {

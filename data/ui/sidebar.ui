@@ -46,55 +46,52 @@
             <!-- workspace page -->
             <child>
               <object class="AdwViewStackPage">
-                <property name="name">workspacebrowser_page</property>
+                <property name="name">workspace_page</property>
                 <property name="title" translatable="yes">Workspace</property>
-                <property name="icon-name">workspacebrowser-symbolic</property>
+                <property name="icon-name">workspace_page-symbolic</property>
                 <property name="child">
-                  <object class="AdwToolbarView">
-                    <child type="top">
-                      <object class="GtkBox">
-                        <property name="orientation">horizontal</property>
-                        <property name="spacing">600</property>
-                        <child>
-                          <object class="GtkToggleButton">
-                            <property name="icon-name">list-add-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">New Collection</property>
-                            <property name="action-name">win.new-collection</property>
+                  <object class="AdwNavigationPage">
+                    <property name="title" translatable="yes">我的应用</property>
+                    <property name="child">
+                      <object class="AdwToolbarView">
+                        <child type="top">
+                          <object class="AdwHeaderBar">
+                            <child type="start">
+                              <object class="GtkButton">
+                                <property name="icon-name">list-add-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">New Collection</property>
+                                <property name="action-name">win.new-collection</property>
+                              </object>
+                            </child>
                           </object>
                         </child>
-                        <child >
-                          <object class="GtkToggleButton">
-                            <property name="icon-name">list-add-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Search Collections</property>
-                            <property name="action-name">win.search-collection</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <property name="content">
-                      <object class="GtkScrolledWindow">
-                        <property name="child">
-                          <object class="GtkListBox" id="collections_list">
-                            <style>
-                              <class name="navigation-sidebar" />
-                            </style>
+                        <property name="content">
+                          <object class="GtkBox">
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="spacing">12</property>
+                            <property name="orientation">vertical</property>
+                            <child>
+                              <object class="GtkButton">
+                                <property name="label" translatable="yes">Todo</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkButton">
+                                <property name="label" translatable="yes">Canlendar</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkButton">
+                                <property name="label" translatable="yes">Reminder</property>
+                              </object>
+                            </child>
                           </object>
                         </property>
                       </object>
                     </property>
                   </object>
                 </property>
-              </object>
-            </child>
-            <!-- settings page -->
-            <child>
-              <object class="AdwViewStackPage">
-                <property name="name">settings_page</property>
-                <property name="title" translatable="yes">Settings</property>
-                <property name="icon-name">settings-symbolic</property>
-                <!-- <property name="child">
-                  <object class="RnSettingsPanel" id="settings_panel"></object>
-                </property> -->
               </object>
             </child>
           </object>

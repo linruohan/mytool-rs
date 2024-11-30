@@ -1,33 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <menu id="main-menu">
-    <submenu>
-      <attribute name="label" translatable="yes">_Filter</attribute>
-      <item>
-        <attribute name="label" translatable="yes">_All</attribute>
-        <attribute name="action">win.filter</attribute>
-        <attribute name="target">All</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Open</attribute>
-        <attribute name="action">win.filter</attribute>
-        <attribute name="target">Open</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Done</attribute>
-        <attribute name="action">win.filter</attribute>
-        <attribute name="target">Done</attribute>
-      </item>
-    </submenu>
-    <item>
-      <attribute name="label" translatable="yes">_Remove Done Tasks</attribute>
-      <attribute name="action">win.remove-done-tasks</attribute>
-    </item>
-    <item>
-      <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
-      <attribute name="action">win.show-help-overlay</attribute>
-    </item>
-  </menu>
   <template class="TodoWindow" parent="AdwApplicationWindow">
     <property name="title" translatable="yes">My Tool</property>
     <property name="width-request">860</property>
@@ -89,8 +61,7 @@
                 <property name="min-sidebar-width">200</property>
                 <property name="sidebar">
                   <object class="AdwNavigationPage">
-                    <property name="title" bind-source="TodoWindow"
-                      bind-property="title" bind-flags="sync-create" />
+                    <property name="title" translatable="yes">Collections</property>
                     <property name="child">
                       <object class="AdwToolbarView">
                         <child type="top">

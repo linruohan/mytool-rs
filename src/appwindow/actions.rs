@@ -39,8 +39,14 @@ impl RnAppWindow {
         self.add_action(&action_devel_menu);
         let action_new_tab = gio::SimpleAction::new("new-tab", None);
         self.add_action(&action_new_tab);
-        let action_filter = gio::SimpleAction::new("filter", None);
+        // filter
+        let action_filter = gio::SimpleAction::new_stateful(
+            "filter",
+            Some(&glib::VariantType::new("s").unwrap()),
+            &String::from("All").to_variant(),
+        );
         self.add_action(&action_filter);
+
         let action_visual_debug =
             gio::SimpleAction::new_stateful("visual-debug", None, &false.to_variant());
         self.add_action(&action_visual_debug);

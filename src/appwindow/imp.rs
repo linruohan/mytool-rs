@@ -1,7 +1,7 @@
 use crate::collection_object::{CollectionData, CollectionObject};
 // Imports
 use crate::utils::data_path;
-use crate::{config, dialogs, RnMainHeader, RnOverlays, RnSidebar};
+use crate::{config, dialogs, RnMainHeader, RnOverlays, RnSidebar, RnTodo};
 use adw::{prelude::*, subclass::prelude::*};
 use gtk::{
     gdk, glib, glib::clone, CompositeTemplate, CssProvider, FilterListModel, PackType,
@@ -273,7 +273,7 @@ impl WindowImpl for RnAppWindow {
             obj.close_force();
         }
 
-        let backup_data: Vec<CollectionData> = RnSidebar::new()
+        let backup_data: Vec<CollectionData> = RnTodo::new()
             .collections()
             .iter::<CollectionObject>()
             .filter_map(|collection_object| collection_object.ok())

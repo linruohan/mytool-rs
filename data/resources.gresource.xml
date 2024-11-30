@@ -2,7 +2,7 @@
 <gresources>
   <gresource prefix="/com/github/linruohan/mytool/">
     <file compressed="true" preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/shortcuts.ui</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/todo.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/appmenu.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/appwindow.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/overlays.ui</file>
