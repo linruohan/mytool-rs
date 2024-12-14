@@ -17,8 +17,15 @@
             <child type="start">
               <object class="GtkBox">
                 <child>
+                  <!-- 左关闭 -->
                   <object class="GtkButton" id="left_close_button">
                     <property name="icon-name">dir-right-symbolic</property>
+                  </object>
+                </child>
+                <child>
+                  <!-- search -->
+                  <object class="GtkButton">
+                    <property name="icon-name">edit-find-symbolic</property>
                   </object>
                 </child>
               </object>
@@ -30,6 +37,7 @@
                   </object>
                 </child>
                 <child>
+                  <!-- 右关闭 -->
                   <object class="GtkButton" id="right_close_button">
                     <property name="icon-name">dir-right-symbolic</property>
                   </object>
@@ -74,16 +82,19 @@
                             <child>
                               <object class="GtkButton">
                                 <property name="label" translatable="yes">Todo</property>
+                                <property name="action-name">win.todo-view</property>
                               </object>
                             </child>
                             <child>
                               <object class="GtkButton">
-                                <property name="label" translatable="yes">Canlendar</property>
+                                <property name="label" translatable="yes">workspace</property>
+                                <property name="action-name">win.work-view</property>
                               </object>
                             </child>
                             <child>
                               <object class="GtkButton">
                                 <property name="label" translatable="yes">Reminder</property>
+                                <property name="action-name">win.reminder-view</property>
                               </object>
                             </child>
                           </object>

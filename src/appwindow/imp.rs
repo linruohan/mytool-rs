@@ -23,6 +23,8 @@ pub(crate) struct RnAppWindow {
     pub(crate) views_split_view: TemplateChild<OverlaySplitView>,
     #[template_child]
     pub(crate) sidebar: TemplateChild<RnSidebar>,
+    #[template_child]
+    pub(crate) views_stack: TemplateChild<ViewStack>,
 }
 
 impl Default for RnAppWindow {
@@ -36,6 +38,7 @@ impl Default for RnAppWindow {
             overlay_split_view: TemplateChild::<adw::OverlaySplitView>::default(),
             views_split_view: TemplateChild::<adw::OverlaySplitView>::default(),
             sidebar: TemplateChild::<RnSidebar>::default(),
+            views_stack: TemplateChild::<ViewStack>::default(),
         }
     }
 }
@@ -48,6 +51,21 @@ impl ObjectSubclass for RnAppWindow {
 
     fn class_init(klass: &mut Self::Class) {
         klass.bind_template();
+        klass.install_action_async("win.todo-view", None, |window, _, _| async move {
+            window.views_stack().set_visible_child_name("done_page");
+        });
+        klass.install_action_async("win.work-view", None, |window, _, _| async move {
+            window
+                .views_stack()
+                .set_visible_child_name("workspacebrowser_page");
+        });
+        klass.install_action_async(
+            "win.reminder-view",
+            None,
+            |window, _, _| async move {
+                window.views_stack().set_visible_child_name("reminder_page");
+            },
+        );
     }
 
     fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {

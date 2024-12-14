@@ -6,7 +6,7 @@ mod imp;
 // Imports
 use crate::{config, task_object::TaskObject, RnApp, RnSidebar};
 use adw::{prelude::*, subclass::prelude::*, ViewStack};
-use gtk::{gio, glib, Application, CustomFilter, IconTheme};
+use gtk::{gio, glib, glib::clone, Application, CustomFilter, IconTheme};
 use tracing::error;
 
 glib::wrapper! {
@@ -49,7 +49,9 @@ impl RnAppWindow {
     pub(crate) fn sidebar(&self) -> RnSidebar {
         self.imp().sidebar.get()
     }
-
+    pub(crate) fn views_stack(&self) -> ViewStack {
+        self.imp().views_stack.get()
+    }
     /// Must be called after application is associated with the window else the init will panic
     pub(crate) fn init(&self) {
         let imp = self.imp();
@@ -82,6 +84,30 @@ impl RnAppWindow {
         // if let Some(wrapper) = self.active_tab_wrapper() {
         //     self.refresh_ui_from_engine(&wrapper);
         // }
+        self.imp()
+            .views_stack
+            .get()
+            .connect_visible_child_name_notify(clone!(
+                #[weak(rename_to=appwindow)]
+                self,
+                move |views_stack| {
+                    if let Some(child_name) = views_stack.visible_child_name() {
+                        match child_name.to_value().get::<String>().unwrap().as_str() {
+                            "workspacebrowser_page" => {
+                                appwindow
+                                    .views_stack()
+                                    .set_visible_child_name("workspacebrowser_page");
+                            }
+                            "done_page" => {
+                                appwindow
+                                    .views_stack()
+                                    .set_visible_child_name("done_page");
+                            }
+                            _ => {}
+                        };
+                    };
+                }
+            ));
     }
 
     fn setup_icon_theme(&self) {

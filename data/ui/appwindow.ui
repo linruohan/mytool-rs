@@ -20,7 +20,7 @@
             <property name="icon-name">settings-symbolic</property>
             <property name="child">
               <object class="AdwOverlaySplitView" id="overlay_split_view">
-                <property name="pin-sidebar">true</property>
+                <property name="show-sidebar">true</property>
                 <property name="min-sidebar-width">250</property>
                 <property name="max-sidebar-width">300</property>
                 <property name="sidebar-width-fraction">0.3</property>
@@ -34,24 +34,61 @@
                   <object class="AdwToastOverlay">
                     <property name="child">
                       <object class="AdwOverlaySplitView" id="views_split_view">
-                        <property name="pin-sidebar">true</property>
-                        <property name="min-sidebar-width">250</property>
-                        <property name="max-sidebar-width">300</property>
-                        <property name="sidebar-width-fraction">0.3</property>
-                        <!-- sidebar -->
+                        <property name="show-sidebar">false</property>
+                        <property name="min-sidebar-width">375</property>
+                        <property name="max-sidebar-width">375</property>
+                        <property name="collapsed">true</property>
+                        <!-- main header -->
                         <property name="sidebar">
-                          <!-- <object class="RnSidebar" id="sidebar">
-                          </object> -->
                           <object class="RnMainHeader" id="main_header">
                           </object>
-                          <!-- <object class="GtkButton">
-                              <property name="label" translatable="yes">item_sidebar_view</property>
-                            </object> -->
                         </property>
-                        <!-- main view -->
+                        <!-- main content -->
                         <property name="content">
-                          <object class="GtkButton">
-                            <property name="label" translatable="yes">views_stack</property>
+                          <object class="AdwViewStack" id="views_stack">
+                            <property name="hexpand">true</property>
+                            <property name="vexpand">true</property>
+                            <property name="vhomogeneous">false</property>
+                            <property name="hhomogeneous">false</property>
+                            <style>
+                              <class name="background" />
+                            </style>
+                            <child>
+                              <object class="AdwViewStackPage">
+                                <property name="name">workspacebrowser_page</property>
+                                <property name="title" translatable="yes">Workspace</property>
+                                <property name="icon-name">workspacebrowser-symbolic</property>
+                                <property name="child">
+                                  <object class="GtkButton">
+                                    <property name="label" translatable="yes">Workspace 主内容区域</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="AdwViewStackPage">
+                                <property name="name">done_page</property>
+                                <property name="title" translatable="yes">done_page</property>
+                                <property name="icon-name">workspacebrowser-symbolic</property>
+                                <property name="child">
+                                  <object class="GtkButton">
+                                    <property name="label" translatable="yes">done_page主内容区域</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="AdwViewStackPage">
+                                <property name="name">reminder_page</property>
+                                <property name="title" translatable="yes">reminder</property>
+                                <property name="icon-name">workspacebrowser-symbolic</property>
+                                <property name="child">
+                                  <object class="GtkButton">
+                                    <property name="label" translatable="yes">reminder 主内容区域</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
                           </object>
                         </property>
                       </object>
