@@ -73,7 +73,7 @@ pub(crate) async fn dialog_close_tab(
         }
     }
 }
-
+#[allow(unused)]
 pub(crate) async fn dialog_close_window(appwindow: &RnAppWindow) {
     let builder = Builder::from_resource(
         (String::from(config::APP_IDPATH) + "ui/dialogs/dialogs.ui").as_str(),
@@ -88,7 +88,7 @@ pub(crate) async fn dialog_close_window(appwindow: &RnAppWindow) {
             true
         }
         "save" => {
-            appwindow.overlays().progressbar_finish();
+            // appwindow.overlays().progressbar_finish();
             true
         }
         _ => {

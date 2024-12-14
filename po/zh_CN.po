@@ -51,7 +51,7 @@ msgstr ""
 "免责声明：该文件格式尚未完全支持，它可能改变并损坏不同版本之间的兼容性。"
 
 #: crates/rnote-ui/data/app.metainfo.xml.in.in:35
-msgid "An overview"
+msgid "An view_stack"
 msgstr "概述"
 
 #: crates/rnote-ui/data/app.metainfo.xml.in.in:40

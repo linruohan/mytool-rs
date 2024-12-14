@@ -49,7 +49,7 @@ impl CollectionObject {
 // ANCHOR_END: impl
 
 // ANCHOR: collection_data
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CollectionData {
     pub title: String,
     pub tasks_data: Vec<TaskData>,

@@ -8,46 +8,68 @@
     <child>
       <object class="AdwBreakpoint">
         <condition>max-width: 1250sp</condition>
-        <setter object="split_view" property="collapsed">true</setter>
+        <setter object="overlay_split_view" property="collapsed">true</setter>
       </object>
     </child>
     <property name="content">
-      <object class="AdwTabOverview" id="overview">
-        <property name="enable-new-tab">true</property>
+      <object class="AdwViewStack" id="view_stack">
         <child>
-          <object class="AdwOverlaySplitView" id="split_view">
-            <property name="pin-sidebar">true</property>
-            <property name="min-sidebar-width">250</property>
-            <property name="max-sidebar-width">300</property>
-            <property name="sidebar-width-fraction">0.3</property>
-            <!-- sidebar -->
-            <property name="sidebar">
-              <object class="RnSidebar" id="sidebar">
-              </object>
-            </property>
-            <!-- main view -->
-            <property name="content">
-              <object class="AdwToolbarView">
-                <property name="top-bar-style">raised</property>
-                <child type="top">
-                  <object class="RnMainHeader" id="main_header">
-                  </object>
-                </child>
-                <property name="content">
-                  <object class="GtkBox">
-                    <property name="orientation">vertical</property>
-                    <child>
-                      <object class="AdwTabBar" id="tabbar">
-                      </object>
-                    </child>
-                    <child>
-                      <object class="RnOverlays" id="overlays">
-                        <property name="hexpand">true</property>
-                        <property name="vexpand">true</property>
-                      </object>
-                    </child>
+          <object class="AdwViewStackPage">
+            <property name="name">main_page</property>
+            <property name="title" translatable="yes">main_page</property>
+            <property name="icon-name">settings-symbolic</property>
+            <property name="child">
+              <object class="AdwOverlaySplitView" id="overlay_split_view">
+                <property name="pin-sidebar">true</property>
+                <property name="min-sidebar-width">250</property>
+                <property name="max-sidebar-width">300</property>
+                <property name="sidebar-width-fraction">0.3</property>
+                <!-- sidebar -->
+                <property name="sidebar">
+                  <object class="RnSidebar" id="sidebar">
                   </object>
                 </property>
+                <!-- main view -->
+                <property name="content">
+                  <object class="AdwToastOverlay">
+                    <property name="child">
+                      <object class="AdwOverlaySplitView" id="views_split_view">
+                        <property name="pin-sidebar">true</property>
+                        <property name="min-sidebar-width">250</property>
+                        <property name="max-sidebar-width">300</property>
+                        <property name="sidebar-width-fraction">0.3</property>
+                        <!-- sidebar -->
+                        <property name="sidebar">
+                          <!-- <object class="RnSidebar" id="sidebar">
+                          </object> -->
+                          <object class="RnMainHeader" id="main_header">
+                          </object>
+                          <!-- <object class="GtkButton">
+                              <property name="label" translatable="yes">item_sidebar_view</property>
+                            </object> -->
+                        </property>
+                        <!-- main view -->
+                        <property name="content">
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">views_stack</property>
+                          </object>
+                        </property>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwViewStackPage">
+            <property name="name">error_db</property>
+            <property name="title" translatable="yes">error_db</property>
+            <property name="icon-name">settings-symbolic</property>
+            <property name="child">
+              <object class="GtkButton">
+                <property name="label" translatable="yes">error_db page</property>
               </object>
             </property>
           </object>

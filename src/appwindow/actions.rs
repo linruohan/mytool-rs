@@ -3,8 +3,6 @@ use crate::{config, dialogs, RnAppWindow};
 use gtk::{gio, glib, glib::clone, prelude::*, UriLauncher, Window};
 use tracing::{debug, error};
 
-const CLIPBOARD_INPUT_STREAM_BUFSIZE: usize = 4096;
-
 impl RnAppWindow {
     /// Boolean actions have no target, and a boolean state. They have a default implementation for the activate signal,
     /// which requests the state to be inverted, and the default implementation for change_state, which sets the state
@@ -30,15 +28,11 @@ impl RnAppWindow {
         self.add_action(&action_keyboard_shortcuts_dialog);
         let action_open_appmenu = gio::SimpleAction::new("open-appmenu", None);
         self.add_action(&action_open_appmenu);
-        let action_toggle_overview = gio::SimpleAction::new("toggle-overview", None);
-        self.add_action(&action_toggle_overview);
         let action_devel_mode =
             gio::SimpleAction::new_stateful("devel-mode", None, &false.to_variant());
         self.add_action(&action_devel_mode);
         let action_devel_menu = gio::SimpleAction::new("devel-menu", None);
         self.add_action(&action_devel_menu);
-        let action_new_tab = gio::SimpleAction::new("new-tab", None);
-        self.add_action(&action_new_tab);
         // filter
         let action_filter = gio::SimpleAction::new_stateful(
             "filter",
@@ -46,48 +40,12 @@ impl RnAppWindow {
             &String::from("All").to_variant(),
         );
         self.add_action(&action_filter);
-
         let action_visual_debug =
             gio::SimpleAction::new_stateful("visual-debug", None, &false.to_variant());
         self.add_action(&action_visual_debug);
         let action_righthanded =
             gio::PropertyAction::new("righthanded", self, "righthanded");
         self.add_action(&action_righthanded);
-        let action_snap_positions = gio::SimpleAction::new_stateful(
-            "snap-positions",
-            None,
-            &false.to_variant(),
-        );
-        self.add_action(&action_snap_positions);
-        let action_show_format_borders = gio::SimpleAction::new_stateful(
-            "show-format-borders",
-            None,
-            &true.to_variant(),
-        );
-        self.add_action(&action_show_format_borders);
-        let action_show_origin_indicator = gio::SimpleAction::new_stateful(
-            "show-origin-indicator",
-            None,
-            &true.to_variant(),
-        );
-        self.add_action(&action_show_origin_indicator);
-
-        let action_respect_borders =
-            gio::PropertyAction::new("respect-borders", self, "respect-borders");
-        self.add_action(&action_respect_borders);
-
-        let action_clipboard_paste_contextmenu =
-            gio::SimpleAction::new("clipboard-paste-contextmenu", None);
-        self.add_action(&action_clipboard_paste_contextmenu);
-        let action_active_tab_move_left =
-            gio::SimpleAction::new("active-tab-move-left", None);
-        self.add_action(&action_active_tab_move_left);
-        let action_active_tab_move_right =
-            gio::SimpleAction::new("active-tab-move-right", None);
-        self.add_action(&action_active_tab_move_right);
-        let action_active_tab_close = gio::SimpleAction::new("active-tab-close", None);
-        self.add_action(&action_active_tab_close);
-
         // Open settings
         action_open_settings.connect_activate(clone!(
             #[weak(rename_to = appwindow)]
@@ -97,7 +55,7 @@ impl RnAppWindow {
                     .sidebar()
                     .sidebar_stack()
                     .set_visible_child_name("settings_page");
-                appwindow.split_view().set_show_sidebar(true);
+                appwindow.overlay_split_view().set_show_sidebar(true);
             }
         ));
 
@@ -137,29 +95,18 @@ impl RnAppWindow {
             #[weak(rename_to=appwindow)]
             self,
             move |_, _| {
-                if !appwindow.split_view().shows_sidebar() {
+                if !appwindow.overlay_split_view().shows_sidebar() {
                     appwindow.main_header().appmenu().popovermenu().popup();
                     return;
                 }
-                if appwindow.split_view().is_collapsed() {
-                    appwindow.split_view().set_show_sidebar(false);
+                if appwindow.overlay_split_view().is_collapsed() {
+                    appwindow.overlay_split_view().set_show_sidebar(false);
                     appwindow.main_header().appmenu().popovermenu().popup();
                 } else {
                     appwindow.sidebar().appmenu().popovermenu().popup();
                 }
             }
         ));
-
-        // Toggle Tabs Overview
-        action_toggle_overview.connect_activate(clone!(
-            #[weak(rename_to=appwindow)]
-            self,
-            move |_, _| {
-                let overview = appwindow.overview();
-                overview.set_open(!overview.is_open());
-            }
-        ));
-
         // Developer mode
         action_devel_mode.connect_activate(clone!(
             #[weak]
@@ -185,73 +132,15 @@ impl RnAppWindow {
         // Its enabled state toggles the visibility of the developer settings menu entry.
         // Must only be modified inside the devel-mode action
         action_devel_menu.set_enabled(false);
-
-        // Create page
-        action_new_tab.connect_activate(clone!(
-            #[weak(rename_to=appwindow)]
-            self,
-            move |_, _| {
-                let wrapper = appwindow.new_canvas_wrapper();
-                appwindow.append_wrapper_new_tab(&wrapper);
-            }
-        ));
-
-        // Tab actions
-        action_active_tab_move_left.connect_activate(clone!(
-            #[weak(rename_to=appwindow)]
-            self,
-            move |_, _| {
-                let Some(active_tab_page) = appwindow.active_tab_page() else {
-                    return;
-                };
-                appwindow
-                    .overlays()
-                    .tabview()
-                    .reorder_backward(&active_tab_page);
-            }
-        ));
-        action_active_tab_move_right.connect_activate(clone!(
-            #[weak(rename_to=appwindow)]
-            self,
-            move |_, _| {
-                let Some(active_tab_page) = appwindow.active_tab_page() else {
-                    return;
-                };
-                appwindow
-                    .overlays()
-                    .tabview()
-                    .reorder_forward(&active_tab_page);
-            }
-        ));
-        action_active_tab_close.connect_activate(clone!(
-            #[weak(rename_to=appwindow)]
-            self,
-            move |_, _| {
-                let Some(active_tab_page) = appwindow.active_tab_page() else {
-                    return;
-                };
-                if appwindow.overlays().tabview().n_pages() <= 1 {
-                    // If there is only one tab left, request to close the entire window.
-                    appwindow.close();
-                } else {
-                    appwindow.close_tab_request(&active_tab_page);
-                }
-            }
-        ));
     }
 
     pub(crate) fn setup_action_accels(&self) {
         let app = self.app();
 
-        app.set_accels_for_action("win.active-tab-close", &["<Ctrl>w"]);
         app.set_accels_for_action("win.fullscreen", &["F11"]);
         app.set_accels_for_action("win.keyboard-shortcuts", &["<Ctrl>question"]);
-        app.set_accels_for_action("win.toggle-overview", &["<Ctrl><Shift>o"]);
         app.set_accels_for_action("win.open-appmenu", &["F10"]);
 
-        app.set_accels_for_action("win.new-tab", &["<Ctrl>t"]);
-        app.set_accels_for_action("win.snap-positions", &["<Ctrl><Shift>p"]);
-        // tasks
         app.set_accels_for_action("win.filter('All')", &["<Ctrl>a"]);
         app.set_accels_for_action("win.filter('Open')", &["<Ctrl>o"]);
         app.set_accels_for_action("win.filter('Done')", &["<Ctrl>d"]);

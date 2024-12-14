@@ -8,7 +8,7 @@ use gtk::subclass::prelude::*;
 use super::TaskData;
 
 // Object holding the state
-#[derive(Properties, Default)]
+#[derive(Properties, Debug, Default)]
 #[properties(wrapper_type = super::TaskObject)]
 pub struct TaskObject {
     #[property(name = "completed", get, set, type = bool, member = completed)]

@@ -113,14 +113,14 @@ impl RnSidebar {
             #[weak]
             appwindow,
             move |_| {
-                appwindow.split_view().set_show_sidebar(false);
+                appwindow.overlay_split_view().set_show_sidebar(false);
             }
         ));
         imp.right_close_button.connect_clicked(clone!(
             #[weak]
             appwindow,
             move |_| {
-                appwindow.split_view().set_show_sidebar(false);
+                appwindow.overlay_split_view().set_show_sidebar(false);
             }
         ));
     }

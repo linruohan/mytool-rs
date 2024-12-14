@@ -2,10 +2,7 @@
 mod appactions;
 
 // Imports
-use crate::{
-    config, RnAppMenu, RnAppWindow, RnCanvasWrapper, RnMainHeader, RnOverlays,
-    RnSidebar,
-};
+use crate::{config, RnAppMenu, RnAppWindow, RnMainHeader, RnSidebar};
 use adw::subclass::prelude::AdwApplicationImpl;
 use gtk::{gio, glib, glib::clone, prelude::*, subclass::prelude::*};
 
@@ -72,7 +69,7 @@ mod imp {
                         #[weak]
                         appwindow,
                         async move {
-                            appwindow.open_file_w_dialogs(input_file, None, true).await;
+                            // appwindow.open_file_w_dialogs(input_file, None, true).await;
                         }
                     ));
                 }
@@ -93,8 +90,6 @@ mod imp {
             RnAppMenu::static_type();
             RnMainHeader::static_type();
             RnSidebar::static_type();
-            RnOverlays::static_type();
-            RnCanvasWrapper::static_type();
         }
 
         /// Initializes and shows a new app window
@@ -110,7 +105,7 @@ mod imp {
                     #[weak]
                     appwindow,
                     async move {
-                        appwindow.open_file_w_dialogs(input_file, None, false).await;
+                        // appwindow.open_file_w_dialogs(input_file, None, false).await;
                     }
                 ));
             }

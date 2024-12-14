@@ -1,10 +1,7 @@
 // Imports
-use crate::{appwindow::RnAppWindow, task_object::TaskObject, RnTodo};
-use adw::{prelude::*, subclass::prelude::*};
-use gtk::{
-    glib::{self, clone},
-    CustomFilter,
-};
+use crate::appwindow::RnAppWindow;
+use adw::prelude::*;
+use gtk::glib::{self, clone};
 use tracing::error;
 
 impl RnAppWindow {
@@ -42,31 +39,13 @@ impl RnAppWindow {
             ),
         );
         app_settings
-            .bind("sidebar-show", &self.split_view(), "show-sidebar")
-            .get_no_changes()
-            .build();
-
-        // autosave
-        app_settings
-            .bind("autosave", self, "autosave")
-            .get_no_changes()
-            .build();
-
-        // autosave interval secs
-        app_settings
-            .bind("autosave-interval-secs", self, "autosave-interval-secs")
+            .bind("sidebar-show", &self.overlay_split_view(), "show-sidebar")
             .get_no_changes()
             .build();
 
         // righthanded
         app_settings
             .bind("righthanded", self, "righthanded")
-            .get_no_changes()
-            .build();
-
-        // respect borders
-        app_settings
-            .bind("respect-borders", self, "respect-borders")
             .get_no_changes()
             .build();
 
@@ -128,59 +107,12 @@ impl RnAppWindow {
         }
 
         // {
-        //     // Save engine config of the current active tab
-        //     if let Some(canvas) = self.active_tab_canvas() {
-        //         canvas.save_engine_config(&app_settings)?;
-        //     }
-        // }
-
-        // {
         //     // Workspaces list
         //     self.sidebar()
         //         .workspacebrowser()
         //         .workspacesbar()
         //         .save_to_settings(&app_settings);
         // }
-
-        Ok(())
-    }
-
-    pub(crate) fn setup_periodic_save(&self) -> anyhow::Result<()> {
-        let app = self.app();
-        let app_settings = app
-            .app_settings()
-            .ok_or_else(|| anyhow::anyhow!("Settings schema not found."))?;
-
-        if let Some(removed_id) = self
-            .imp()
-            .periodic_configsave_source_id
-            .borrow_mut()
-            .replace(glib::source::timeout_add_seconds_local(
-                Self::PERIODIC_CONFIGSAVE_INTERVAL,
-                clone!(
-                    #[weak]
-                    app_settings,
-                    #[weak(rename_to=appwindow)]
-                    self,
-                    #[upgrade_or]
-                    glib::ControlFlow::Break,
-                    move || {
-                        // let Some(canvas) = appwindow.active_tab_canvas() else {
-                        //     return glib::ControlFlow::Continue;
-                        // };
-                        // if let Err(e) = canvas.save_engine_config(&app_settings) {
-                        //     error!(
-                        //         "Saving engine config in periodic save task failed , Err: {e:?}"
-                        //     );
-                        // }
-
-                        glib::ControlFlow::Continue
-                    }
-                ),
-            ))
-        {
-            removed_id.remove();
-        }
 
         Ok(())
     }

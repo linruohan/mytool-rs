@@ -8,7 +8,7 @@ use std::cell::OnceCell;
 
 // ANCHOR: collection_object
 // Object holding the state
-#[derive(Properties, Default)]
+#[derive(Properties, Debug, Default)]
 #[properties(wrapper_type = super::CollectionObject)]
 pub struct CollectionObject {
     #[property(get, set)]

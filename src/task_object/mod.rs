@@ -30,7 +30,7 @@ impl TaskObject {
     }
 }
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct TaskData {
     pub completed: bool,
     pub content: String,

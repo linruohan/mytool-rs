@@ -95,10 +95,6 @@ impl RnMainHeader {
         self.imp().right_sidebar_reveal_toggle.get()
     }
 
-    // pub(crate) fn canvasmenu(&self) -> RnCanvasMenu {
-    //     self.imp().canvasmenu.get()
-    // }
-
     pub(crate) fn appmenu(&self) -> RnAppMenu {
         self.imp().appmenu.get()
     }

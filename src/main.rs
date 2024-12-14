@@ -9,32 +9,23 @@
 pub(crate) mod app;
 pub(crate) mod appmenu;
 pub(crate) mod appwindow;
-pub(crate) mod canvaswrapper;
 mod collection_object;
 pub(crate) mod config;
 pub(crate) mod dialogs;
 pub(crate) mod env;
-pub(crate) mod filetype;
 pub(crate) mod globals;
 pub(crate) mod mainheader;
-pub(crate) mod overlays;
 pub(crate) mod sidebar;
 mod task_object;
-pub(crate) mod todo;
 mod utils;
 
 pub(crate) use app::RnApp;
 pub(crate) use appmenu::RnAppMenu;
 pub(crate) use appwindow::RnAppWindow;
-pub(crate) use canvaswrapper::RnCanvasWrapper;
-pub(crate) use filetype::FileType;
 pub(crate) use mainheader::RnMainHeader;
-pub(crate) use overlays::RnOverlays;
 pub(crate) use sidebar::RnSidebar;
-pub(crate) use todo::RnTodo;
 
 // Renames
-extern crate nalgebra as na;
 // Imports
 use adw::prelude::*;
 use anyhow::Context;

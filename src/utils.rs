@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 use std::slice::Iter;
 
 // ANCHOR: data_path
+#[allow(unused)]
 pub fn data_path() -> PathBuf {
     let mut path = glib::user_data_dir();
     path.push(APP_ID);
@@ -50,6 +51,7 @@ pub(crate) async fn create_replace_file_future(
     Ok(())
 }
 
+#[allow(unused)]
 pub(crate) fn str_from_u8_nul_utf8(
     utf8_src: &[u8],
 ) -> Result<&str, std::str::Utf8Error> {

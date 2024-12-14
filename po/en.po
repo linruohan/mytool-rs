@@ -45,7 +45,7 @@ msgid ""
 msgstr ""
 
 #: crates/rnote-ui/data/app.metainfo.xml.in.in:35
-msgid "An overview"
+msgid "An view_stack"
 msgstr ""
 
 #: crates/rnote-ui/data/app.metainfo.xml.in.in:40
