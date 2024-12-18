@@ -29,7 +29,7 @@ configure_file(
 # Copy the config.rs output to the source directory
 run_command(
     'cp',
-    meson.project_build_root() /  'src' / 'config.rs',
+    meson.project_build_root() / 'src' / 'config.rs',
     meson.project_source_root() / 'src' / 'config.rs',
     check: true,
 )
@@ -41,21 +41,17 @@ mytool_ui_sources = files(
     'appwindow/appsettings.rs',
     'appwindow/imp.rs',
     'appwindow/mod.rs',
-    'canvas/mod.rs',
     'collection_object/imp.rs',
     'collection_object/mod.rs',
+    'dialogs/mod.rs',
     'task_object/imp.rs',
     'task_object/mod.rs',
-    'dialogs/mod.rs',
     'appmenu.rs',
-    'canvaswrapper.rs',
     'config.rs',
     'env.rs',
-    'filetype.rs',
     'globals.rs',
     'main.rs',
     'mainheader.rs',
-    'overlays.rs',
     'sidebar.rs',
     'utils.rs',
 )

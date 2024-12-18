@@ -55,8 +55,7 @@ if glib_compile_schemas.found()
         'validate-gschema',
         glib_compile_schemas,
         args: [
-            '--dry-run',
-            datadir / 'glib-2.0' / 'schemas',
+            '--dry-run', datadir / 'glib-2.0' / 'schemas',
         ],
     )
 endif
@@ -342,13 +341,10 @@ mytool_ui_gresources_icons_files = files(
 )
 
 mytool_ui_gresources_ui_files = files(
-    'ui/dialogs/dialogs.ui',
     'ui/appmenu.ui',
     'ui/appwindow.ui',
-    'ui/canvaswrapper.ui',
-    'ui/contextmenu.ui',
+    'ui/dialogs/dialogs.ui',
     'ui/mainheader.ui',
-    'ui/overlays.ui',
     'ui/shortcuts.ui',
     'ui/sidebar.ui',
     'ui/style.css',
@@ -418,7 +414,6 @@ sounds_files = files(
 
 # install sounds flat in one directory
 install_data(sounds_files, install_dir: pkgdatadir / 'sounds')
-
 
 # fonts
 fonts_files = files(
