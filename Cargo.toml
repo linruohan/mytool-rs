@@ -53,6 +53,13 @@ anyhow = "1.0"
 [profile.dev]
 debug = true
 opt-level = 2
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = 'unwind'
+incremental = true
+codegen-units = 16
+rpath = false
 
 [profile.release]
 codegen-units = 1

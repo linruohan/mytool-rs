@@ -143,12 +143,10 @@ impl WindowImpl for RnAppWindow {
         self.main_header.headerbar().set_sensitive(false);
         self.sidebar.headerbar().set_sensitive(false);
 
-        let todo = RnTodo::default();
-        todo.save_data();
+        self.obj().todo().save_data();
         // Inhibit (Overwrite) the default handler. This handler is then responsible for destroying the window.
         // glib::Propagation::Stop
         // Pass close request on to the parent
-
         self.parent_close_request()
     }
 }
