@@ -1,16 +1,13 @@
 // Imports
-use crate::{config, RnMainHeader, RnSidebar};
+use crate::{config, RnMainHeader, RnSidebar, RnTodo};
 use adw::{prelude::*, subclass::prelude::*, OverlaySplitView, ViewStack};
-use gtk::{
-    gdk, glib, glib::clone, CompositeTemplate, CssProvider, FilterListModel, PackType,
-};
+use gtk::{gdk, glib, glib::clone, CompositeTemplate, CssProvider, PackType};
 use once_cell::sync::Lazy;
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 use std::rc::Rc;
 #[derive(Debug, CompositeTemplate)]
 #[template(resource = "/com/github/linruohan/mytool/ui/appwindow.ui")]
 pub(crate) struct RnAppWindow {
-    pub(crate) current_filter_model: RefCell<Option<FilterListModel>>,
     pub(crate) righthanded: Cell<bool>,
 
     #[template_child]
@@ -20,25 +17,24 @@ pub(crate) struct RnAppWindow {
     #[template_child]
     pub(crate) overlay_split_view: TemplateChild<OverlaySplitView>,
     #[template_child]
-    pub(crate) views_split_view: TemplateChild<OverlaySplitView>,
-    #[template_child]
     pub(crate) sidebar: TemplateChild<RnSidebar>,
     #[template_child]
     pub(crate) views_stack: TemplateChild<ViewStack>,
+    #[template_child]
+    pub(crate) todo: TemplateChild<RnTodo>,
 }
 
 impl Default for RnAppWindow {
     fn default() -> Self {
         Self {
-            current_filter_model: RefCell::new(None),
             righthanded: Cell::new(true),
 
             view_stack: TemplateChild::<ViewStack>::default(),
             main_header: TemplateChild::<RnMainHeader>::default(),
             overlay_split_view: TemplateChild::<adw::OverlaySplitView>::default(),
-            views_split_view: TemplateChild::<adw::OverlaySplitView>::default(),
             sidebar: TemplateChild::<RnSidebar>::default(),
             views_stack: TemplateChild::<ViewStack>::default(),
+            todo: TemplateChild::<RnTodo>::default(),
         }
     }
 }
@@ -147,13 +143,13 @@ impl WindowImpl for RnAppWindow {
         self.main_header.headerbar().set_sensitive(false);
         self.sidebar.headerbar().set_sensitive(false);
 
-        // 保存 collections
-        // if let Some(wrapper) = self.obj().active_tab_wrapper() {
-        //     wrapper.save_collections();
-        // }
-
+        let todo = RnTodo::default();
+        todo.save_data();
         // Inhibit (Overwrite) the default handler. This handler is then responsible for destroying the window.
-        glib::Propagation::Stop
+        // glib::Propagation::Stop
+        // Pass close request on to the parent
+
+        self.parent_close_request()
     }
 }
 

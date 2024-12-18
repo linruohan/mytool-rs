@@ -4,9 +4,9 @@ mod appsettings;
 mod imp;
 
 // Imports
-use crate::{config, task_object::TaskObject, RnApp, RnSidebar};
+use crate::{config, RnApp, RnSidebar};
 use adw::{prelude::*, subclass::prelude::*, ViewStack};
-use gtk::{gio, glib, glib::clone, Application, CustomFilter, IconTheme};
+use gtk::{gio, glib, glib::clone, Application, IconTheme};
 use tracing::error;
 
 glib::wrapper! {
@@ -36,6 +36,9 @@ impl RnAppWindow {
     }
     pub(crate) fn main_header(&self) -> crate::RnMainHeader {
         self.imp().main_header.get()
+    }
+    pub(crate) fn todo(&self) -> crate::RnTodo {
+        self.imp().todo.get()
     }
     #[allow(unused)]
     pub(crate) fn view_stack(&self) -> ViewStack {
@@ -128,48 +131,5 @@ impl RnAppWindow {
         }
 
         self.destroy();
-    }
-
-    fn set_filter(&self) {
-        self.imp()
-            .current_filter_model
-            .borrow()
-            .clone()
-            .expect("`current_filter_model` should be set in `set_current_collection`.")
-            .set_filter(self.filter().as_ref());
-    }
-    // ANCHOR_END: helper
-
-    fn filter(&self) -> Option<CustomFilter> {
-        // Get filter state from settings
-        let filter_state: String = self.app().app_settings()?.get("filter");
-
-        // Create custom filters
-        let filter_open = CustomFilter::new(|obj| {
-            // Get `TaskObject` from `glib::Object`
-            let task_object = obj
-                .downcast_ref::<TaskObject>()
-                .expect("The object needs to be of type `TaskObject`.");
-
-            // Only allow completed tasks
-            !task_object.is_completed()
-        });
-        let filter_done = CustomFilter::new(|obj| {
-            // Get `TaskObject` from `glib::Object`
-            let task_object = obj
-                .downcast_ref::<TaskObject>()
-                .expect("The object needs to be of type `TaskObject`.");
-
-            // Only allow done tasks
-            task_object.is_completed()
-        });
-
-        // Return the correct filter
-        match filter_state.as_str() {
-            "All" => None,
-            "Open" => Some(filter_open),
-            "Done" => Some(filter_done),
-            _ => unreachable!(),
-        }
     }
 }

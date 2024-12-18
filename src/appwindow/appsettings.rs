@@ -28,13 +28,16 @@ impl RnAppWindow {
                 }
             }
         ));
+        // filter
+        let action_filter = app_settings.create_action("filter");
+        self.add_action(&action_filter);
         app_settings.connect_changed(
             Some("filter"),
             clone!(
                 #[weak(rename_to = window)]
                 self,
                 move |_, _| {
-                    window.set_filter();
+                    window.todo().set_filter();
                 }
             ),
         );

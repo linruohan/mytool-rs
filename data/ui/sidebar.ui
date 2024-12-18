@@ -51,58 +51,31 @@
             <style>
               <class name="background" />
             </style>
-            <!-- workspace page -->
+            <!-- sidebar page -->
             <child>
-              <object class="AdwViewStackPage">
-                <property name="name">workspace_page</property>
-                <property name="title" translatable="yes">Workspace</property>
-                <property name="icon-name">workspace_page-symbolic</property>
-                <property name="child">
-                  <object class="AdwNavigationPage">
-                    <property name="title" translatable="yes">我的应用</property>
-                    <property name="child">
-                      <object class="AdwToolbarView">
-                        <child type="top">
-                          <object class="AdwHeaderBar">
-                            <child type="start">
-                              <object class="GtkButton">
-                                <property name="icon-name">list-add-symbolic</property>
-                                <property name="tooltip-text" translatable="yes">New Collection</property>
-                                <property name="action-name">win.new-collection</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                        <property name="content">
-                          <object class="GtkBox">
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="spacing">12</property>
-                            <property name="orientation">vertical</property>
-                            <child>
-                              <object class="GtkButton">
-                                <property name="label" translatable="yes">Todo</property>
-                                <property name="action-name">win.todo-view</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkButton">
-                                <property name="label" translatable="yes">workspace</property>
-                                <property name="action-name">win.work-view</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkButton">
-                                <property name="label" translatable="yes">Reminder</property>
-                                <property name="action-name">win.reminder-view</property>
-                              </object>
-                            </child>
-                          </object>
-                        </property>
-                      </object>
-                    </property>
+              <object class="GtkBox">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="spacing">12</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Todo</property>
+                    <property name="action-name">win.todo-view</property>
                   </object>
-                </property>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">workspace</property>
+                    <property name="action-name">win.work-view</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Reminder</property>
+                    <property name="action-name">win.reminder-view</property>
+                  </object>
+                </child>
               </object>
             </child>
           </object>

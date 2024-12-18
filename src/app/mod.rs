@@ -64,7 +64,7 @@ mod imp {
                 .active_window()
                 .map(|w| w.downcast::<RnAppWindow>().unwrap())
             {
-                if let Some(input_file) = input_file {
+                if let Some(_input_file) = input_file {
                     glib::spawn_future_local(clone!(
                         #[weak]
                         appwindow,
@@ -93,22 +93,22 @@ mod imp {
         }
 
         /// Initializes and shows a new app window
-        pub(crate) fn new_appwindow_init_show(&self, input_file: Option<gio::File>) {
+        pub(crate) fn new_appwindow_init_show(&self, _input_file: Option<gio::File>) {
             let appwindow =
                 RnAppWindow::new(self.obj().upcast_ref::<gtk::Application>());
             appwindow.init();
             appwindow.present();
 
             // Loading in input file in the first tab, if Some
-            if let Some(input_file) = input_file {
-                glib::spawn_future_local(clone!(
-                    #[weak]
-                    appwindow,
-                    async move {
-                        // appwindow.open_file_w_dialogs(input_file, None, false).await;
-                    }
-                ));
-            }
+            // if let Some(input_file) = input_file {
+            //     glib::spawn_future_local(clone!(
+            //         #[weak]
+            //         appwindow,
+            //         async move {
+            //             appwindow.open_file_w_dialogs(input_file, None, false).await;
+            //         }
+            //     ));
+            // }
         }
     }
 }
