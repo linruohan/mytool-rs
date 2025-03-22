@@ -1,7 +1,7 @@
 // Imports
-use crate::{RnAppMenu, RnAppWindow};
+use crate::{FilterPaneRow, FilterType, RnAppMenu, RnAppWindow};
 use adw::{prelude::*, subclass::prelude::*};
-use gtk::{glib, glib::clone, Button, CompositeTemplate, Widget};
+use gtk::{glib, glib::clone, Button, CompositeTemplate, FlowBox, Widget};
 mod imp {
 
     use super::*;
@@ -23,6 +23,8 @@ mod imp {
         // pub(crate) workspacebrowser: TemplateChild<RnWorkspaceBrowser>,
         // #[template_child]
         // pub(crate) settings_panel: TemplateChild<RnSettingsPanel>,
+        #[template_child]
+        pub(crate) filters_flow: TemplateChild<FlowBox>,
     }
 
     #[glib::object_subclass]
@@ -80,6 +82,35 @@ impl RnSidebar {
         self.imp().left_close_button.get()
     }
 
+    pub(crate) fn filters_flow(&self) -> FlowBox {
+        self.imp().filters_flow.get()
+    }
+    pub(crate) fn filters_flow_init(&self){
+        let filters_flow=self.filters_flow();
+        let inbox_filter = FilterPaneRow::new(FilterType::INBOX);
+        let today_filter = FilterPaneRow::new(FilterType::TODAY);
+        let scheduled_filter =FilterPaneRow::new(FilterType::SCHEDULED) ;
+        let labels_filter = FilterPaneRow::new(FilterType::LABELS) ;
+        let pinboard_filter = FilterPaneRow::new(FilterType::PINBOARD) ;
+        let completed_filter = FilterPaneRow::new(FilterType::COMPLETED);
+        filters_flow.append (&inbox_filter);
+        filters_flow.append (&today_filter);
+        filters_flow.append (&scheduled_filter);
+        filters_flow.append (&labels_filter);
+        filters_flow.append (&pinboard_filter);
+        filters_flow.append (&completed_filter);
+        inbox_filter.init();
+        today_filter.init();
+        scheduled_filter.init();
+        labels_filter.init();
+        pinboard_filter.init();
+        completed_filter.init();
+        // filters_flow.child_activated.connect ((child) => {
+        //     let filter = (Layouts.FilterPaneRow) child;
+        //     Services.EventBus.get_default ().pane_selected (PaneType.FILTER, filter.filter_type.to_string ());
+        // });
+
+    }
     pub(crate) fn right_close_button(&self) -> Button {
         self.imp().right_close_button.get()
     }
@@ -91,21 +122,14 @@ impl RnSidebar {
     pub(crate) fn sidebar_stack(&self) -> adw::ViewStack {
         self.imp().sidebar_stack.get()
     }
-
-    // pub(crate) fn workspacebrowser(&self) -> RnWorkspaceBrowser {
-    //     self.imp().workspacebrowser.get()
-    // }
-
-    // pub(crate) fn settings_panel(&self) -> RnSettingsPanel {
-    //     self.imp().settings_panel.get()
-    // }
-    // ANCHOR: helper
-
     // ANCHOR_END: setup_callbacks
     pub(crate) fn init(&self, appwindow: &RnAppWindow) {
         let imp = self.imp();
-
+        
         imp.appmenu.get().init(appwindow);
+        self.filters_flow().set_min_children_per_line(2);
+        self.filters_flow().set_max_children_per_line(2);
+        self.filters_flow_init();
         // imp.workspacebrowser.get().init(appwindow);
         // imp.settings_panel.get().init(appwindow);
 

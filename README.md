@@ -21,6 +21,7 @@ C:\software\msys2\usr\bin
 ### MSYS2 依赖安装
 
 ```bash
+pacman -S mingw-w64-ucrt-x86_64-gtk4
 pacman -S git mingw-w64-x86_64-xz mingw-w64-x86_64-pkgconf mingw-w64-x86_64-gcc mingw-w64-x86_64-clang \
 mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-make mingw-w64-x86_64-cmake \
 mingw-w64-x86_64-meson mingw-w64-x86_64-diffutils mingw-w64-x86_64-desktop-file-utils mingw-w64-x86_64-appstream \

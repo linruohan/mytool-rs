@@ -14,19 +14,22 @@ pub(crate) mod config;
 pub(crate) mod dialogs;
 pub(crate) mod env;
 pub(crate) mod globals;
+pub(crate) mod layouts;
 pub(crate) mod mainheader;
 pub(crate) mod sidebar;
 mod task_object;
 pub(crate) mod todo;
+pub(crate) mod myenum;
 mod utils;
 
 pub(crate) use app::RnApp;
 pub(crate) use appmenu::RnAppMenu;
 pub(crate) use appwindow::RnAppWindow;
+pub(crate) use layouts::FilterPaneRow;
 pub(crate) use mainheader::RnMainHeader;
 pub(crate) use sidebar::RnSidebar;
 pub(crate) use todo::RnTodo;
-
+pub(crate) use myenum::FilterType;
 // Renames
 // Imports
 use adw::prelude::*;
