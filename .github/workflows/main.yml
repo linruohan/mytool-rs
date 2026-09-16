@@ -37,7 +37,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          target: x86_64-pc-windows-msvc
+          target: x86_64-pc-windows-gnu
 
       - name: 安装 sccache 编译缓存
         uses: mozilla-actions/sccache-action@v0.0.9
@@ -47,14 +47,14 @@ jobs:
 
       # LTO 已在 profile.release 中开启,直接全量 Release 构建
       - name: 构建 Release exe
-        run: cargo build --release --target x86_64-pc-windows-msvc -p mytool
+        run: cargo build --release --target x86_64-pc-windows-gnu -p mytool
 
       # 产物带版本号重命名,便于多版本共存(主题/多语言已编译期内嵌,单 exe 可直接分发)
       - name: 整理产物
         shell: pwsh
         run: |
           $version = "${{ github.ref_name }}"
-          Copy-Item "target/x86_64-pc-windows-msvc/release/mytool.exe" "mytool-$version.exe"
+          Copy-Item "target/x86_64-pc-windows-gnu/release/mytool.exe" "mytool-$version.exe"
           Get-Item "mytool-$version.exe" | Select-Object Name, @{N='SizeMB';E={[math]::Round($_.Length/1MB,2)}}
 
       - name: 上传构建产物(Artifact)
